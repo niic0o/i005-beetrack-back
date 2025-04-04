@@ -34,7 +34,6 @@ model User {
   id       String  @id @default(uuid())
   name     String
   last_name String
-  address  String
   email    String  @unique
   password String
   status   Status  @default(ACTIVE)
@@ -48,6 +47,7 @@ model User {
 model Store {
   id       String   @id @default(uuid())
   name     String
+  address  String
   status   Status   @default(ACTIVE)
 
   ownerId  String   
