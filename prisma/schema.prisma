@@ -20,7 +20,7 @@ enum Status {
 enum PaymentMethod {
   CREDIT_CARD
   DEBIT_CARD
-  PAYPAL
+  VIRTUAL
   CASH
 }
 
@@ -30,6 +30,16 @@ enum OrderStatus {
   CANCELLED
 }
 
+enum ProductStatus {
+  DISPONIBLE
+  ESCASO
+  AGOTADO
+}
+
+model UserTypes {
+  id       String   @id @default(cuid())
+  role  String
+}
 model User {
   id       String  @id @default(uuid())
   name     String
@@ -68,7 +78,7 @@ model Product {
   stockMin    Int
   image       String?
   description String?
-
+  status      ProductStatus   @default(DISPONIBLE)
   storeId String
   store   Store @relation(fields: [storeId], references: [id])
 
