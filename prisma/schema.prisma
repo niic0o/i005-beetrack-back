@@ -12,6 +12,7 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 enum Status {
   ACTIVE
   BLOCKED
@@ -36,51 +37,61 @@ enum ProductStatus {
   AGOTADO
 }
 
-model UserTypes {
-  id       String   @id @default(cuid())
-  role  String
-}
-model User {
-  id       String  @id @default(uuid())
-  name     String
-  last_name String
-  email    String  @unique
-  password String
-  status   Status  @default(ACTIVE)
+model UserType {
+  userTypeID String @id @default(cuid())
+  role       String
 
-  stores   Store[]  
+  Users User[]
+}
+
+model User {
+  id         String   @id @default(uuid())
+  userTypeID String
+  userType   UserType @relation(fields: [userTypeID], references: [userTypeID])
+  name       String
+  last_name  String
+  birthdate  DateTime 
+  email      String   @unique
+  password   String
+  status     Status   @default(ACTIVE)
+
+  stores Store[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Store {
-  id       String   @id @default(uuid())
-  name     String
-  address  String
-  status   Status   @default(ACTIVE)
+  id      String @id @default(uuid())
+  name    String
+  address String
+  tel     String
+  status  Status @default(ACTIVE)
 
-  ownerId  String   
-  owner    User     @relation(fields: [ownerId], references: [id])
+  userID String
+  user   User   @relation(fields: [userID], references: [id])
 
-  products  Product[]
-  orders    Order[]
+  products Product[]
+  orders   Order[]
+  dailyReport DailyReport[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Product {
-  id          String   @id @default(uuid())
+  id          String        @id @default(uuid())
+  storeId     String
+  store       Store         @relation(fields: [storeId], references: [id])
   name        String
-  price       Decimal
-  stock       Int
-  stockMin    Int
+  salesPrice  Decimal
+  costPrice Decimal
+  stock Int
+  stock_optimus Int
+  stock_min   Int
   image       String?
   description String?
-  status      ProductStatus   @default(DISPONIBLE)
-  storeId String
-  store   Store @relation(fields: [storeId], references: [id])
+  status      ProductStatus @default(DISPONIBLE)
 
   orderItems OrderLines[]
 
@@ -89,30 +100,30 @@ model Product {
 }
 
 model Order {
-  id          String   @id @default(uuid())
+  id          String      @id @default(uuid())
   totalAmount Decimal
   status      OrderStatus @default(PENDING)
 
   storeId String
-  store   Store @relation(fields: [storeId], references: [id])
+  store   Store  @relation(fields: [storeId], references: [id])
 
   orderItems OrderLines[]
 
-   paymentId String
+  paymentId String
   payment   Payment @relation(fields: [paymentId], references: [id])
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Payment {
-  id String @id @default(uuid())
-  name String
-    orders    Order[]
+  id     String  @id @default(uuid())
+  name   String
+  orders Order[]
 }
 
 model OrderLines {
-  id        String  @id @default(uuid())
+  id        String @id @default(uuid())
   orderId   String
   productId String
   quantity  Int
@@ -120,6 +131,11 @@ model OrderLines {
   order   Order   @relation(fields: [orderId], references: [id])
   product Product @relation(fields: [productId], references: [id])
 
-  @@unique([orderId, productId]) 
+  @@unique([orderId, productId])
 }
 
+model dailyReport {
+  id        String @id @default(uuid())
+  date      DateTime
+  
+}
