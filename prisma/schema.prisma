@@ -12,65 +12,85 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 enum Status {
   ACTIVE
   BLOCKED
 }
 
 enum PaymentMethod {
-  CREDIT_CARD
-  DEBIT_CARD
-  PAYPAL
-  CASH
+CARD
+DIGITAL
+CASH
 }
 
 enum OrderStatus {
+  PAID
   PENDING
-  COMPLETED
-  CANCELLED
+  CANCELED
+}
+
+enum ProductStatus {
+  AVAILABLE
+  LIMITED
+  SOLDOUT
+}
+
+model UserType {
+  userTypeID String @id @default(cuid())
+  role       String
+
+  Users User[]
 }
 
 model User {
-  id       String  @id @default(uuid())
-  name     String
-  last_name String
-  email    String  @unique
-  password String
-  status   Status  @default(ACTIVE)
+  id         String   @id @default(uuid())
+  userTypeID String
+  userType   UserType @relation(fields: [userTypeID], references: [userTypeID])
+  name       String
+  last_name  String
+  birthdate  DateTime
+  email      String   @unique
+  password   String
+  status     Status   @default(ACTIVE)
 
-  stores   Store[]  
+  stores Store[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Store {
-  id       String   @id @default(uuid())
-  name     String
-  address  String
-  status   Status   @default(ACTIVE)
+  id      String @id @default(uuid())
+  name    String
+  address String
+  tel     String?
+  status  Status @default(ACTIVE)
 
-  ownerId  String   
-  owner    User     @relation(fields: [ownerId], references: [id])
+  userID String
+  user   User   @relation(fields: [userID], references: [id])
 
-  products  Product[]
-  orders    Order[]
+  products    Product[]
+  orders      Order[]
+  dailyReport DailyReport[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Product {
-  id          String   @id @default(uuid())
-  name        String
-  price       Decimal
-  stock       Int
-  stockMin    Int
-  image       String?
-  description String?
-
-  storeId String
-  store   Store @relation(fields: [storeId], references: [id])
+  id            String        @id @default(uuid())
+  storeId       String
+  store         Store         @relation(fields: [storeId], references: [id])
+  name          String
+  salesPrice    Decimal       @db.Decimal(9, 2)
+  costPrice     Decimal       @db.Decimal(9, 2)
+  stock         Int
+  stock_optimus Int
+  stock_min     Int
+  imagePath     String?
+  description   String?
+  status        ProductStatus @default(LIMITED)
 
   orderItems OrderLines[]
 
@@ -79,37 +99,71 @@ model Product {
 }
 
 model Order {
-  id          String   @id @default(uuid())
-  totalAmount Decimal
-  status      OrderStatus @default(PENDING)
-
-  storeId String
-  store   Store @relation(fields: [storeId], references: [id])
+  id             String      @id @default(uuid())
+  storeId        String
+  store          Store       @relation(fields: [storeId], references: [id])
+  subTotalAmount Decimal     @db.Decimal(10, 2)
+  discountID     String?
+  discount       Discount?   @relation(fields: [discountID], references: [id])
+  totalAmount    Decimal     @db.Decimal(10, 2)
+  paymentId      String?
+  payment        Payment?    @relation(fields: [paymentId], references: [id])
+  pdfPath        String?
+  status         OrderStatus @default(PENDING)
 
   orderItems OrderLines[]
 
-   paymentId String
-  payment   Payment @relation(fields: [paymentId], references: [id])
-  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Discount {
+  id          String  @id @default(uuid())
+  description String
+  rate        Decimal @db.Decimal(5, 2)
+
+  orders Order[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Payment {
-  id String @id @default(uuid())
-  name String
-    orders    Order[]
+  id   String @id @default(uuid())
+  name PaymentMethod @default(CASH)
+
+  orders Order[]
 }
 
 model OrderLines {
-  id        String  @id @default(uuid())
-  orderId   String
-  productId String
-  quantity  Int
+  id              String  @id @default(uuid())
+  orderId         String
+  productId       String
+  quantity        Int
+  totalSalesPrice Decimal @db.Decimal(9, 2)
 
   order   Order   @relation(fields: [orderId], references: [id])
   product Product @relation(fields: [productId], references: [id])
 
-  @@unique([orderId, productId]) 
+  @@unique([orderId, productId])
 }
 
+model DailyReport {
+  id                  String  @id @default(uuid())
+  totalOrders         Int @default(0)
+  totalProductsSold   Int @default(0)
+  totalSales          Decimal @default(0.0) @db.Decimal(13, 2)
+  totalCost           Decimal @default(0.0) @db.Decimal(13, 2)
+  totalCashSales      Decimal @default(0.0) @db.Decimal(13, 2)
+  totalCardSales      Decimal @default(0.0) @db.Decimal(13, 2)
+  totalDigitalSales   Decimal @default(0.0) @db.Decimal(13, 2)
+  totalProfit         Decimal @db.Decimal(13, 2)
+  bestSellingProduct  String?
+  leastSellingProduct String?
+
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
