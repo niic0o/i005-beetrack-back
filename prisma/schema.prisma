@@ -21,14 +21,14 @@ enum Status {
 enum PaymentMethod {
   CREDIT_CARD
   DEBIT_CARD
-  VIRTUAL
+  DIGITAL
   CASH
 }
 
 enum OrderStatus {
-  PENDING
-  COMPLETED
-  CANCELLED
+  PENDIENTE
+  PAGADA
+  ANULADA
 }
 
 enum ProductStatus {
@@ -50,7 +50,7 @@ model User {
   userType   UserType @relation(fields: [userTypeID], references: [userTypeID])
   name       String
   last_name  String
-  birthdate  DateTime 
+  birthdate  DateTime
   email      String   @unique
   password   String
   status     Status   @default(ACTIVE)
@@ -71,8 +71,8 @@ model Store {
   userID String
   user   User   @relation(fields: [userID], references: [id])
 
-  products Product[]
-  orders   Order[]
+  products    Product[]
+  orders      Order[]
   dailyReport DailyReport[]
 
   createdAt DateTime @default(now())
@@ -80,18 +80,18 @@ model Store {
 }
 
 model Product {
-  id          String        @id @default(uuid())
-  storeId     String
-  store       Store         @relation(fields: [storeId], references: [id])
-  name        String
-  salesPrice  Decimal
-  costPrice Decimal
-  stock Int
+  id            String        @id @default(uuid())
+  storeId       String
+  store         Store         @relation(fields: [storeId], references: [id])
+  name          String
+  salesPrice    Decimal
+  costPrice     Decimal
+  stock         Int
   stock_optimus Int
-  stock_min   Int
-  image       String?
-  description String?
-  status      ProductStatus @default(DISPONIBLE)
+  stock_min     Int
+  image         String?
+  description   String?
+  status        ProductStatus @default(DISPONIBLE)
 
   orderItems OrderLines[]
 
@@ -100,33 +100,48 @@ model Product {
 }
 
 model Order {
-  id          String      @id @default(uuid())
-  totalAmount Decimal
-  status      OrderStatus @default(PENDING)
-
-  storeId String
-  store   Store  @relation(fields: [storeId], references: [id])
+  id             String      @id @default(uuid())
+  storeId        String
+  store          Store       @relation(fields: [storeId], references: [id])
+  subTotalAmount Decimal
+  discountID     String?
+  discount       Discount?   @relation(fields: [discountID], references: [id])
+  totalAmount    Decimal
+  paymentId      String?
+  payment        Payment?    @relation(fields: [paymentId], references: [id])
+  pdf            String?
+  status         OrderStatus @default(PENDIENTE)
 
   orderItems OrderLines[]
 
-  paymentId String
-  payment   Payment @relation(fields: [paymentId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Discount {
+  id          String  @id @default(uuid())
+  description String
+  rate        Decimal
+
+  orders Order[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Payment {
-  id     String  @id @default(uuid())
-  name   String
+  id   String @id @default(uuid())
+  name String
+
   orders Order[]
 }
 
 model OrderLines {
-  id        String @id @default(uuid())
-  orderId   String
-  productId String
-  quantity  Int
+  id              String  @id @default(uuid())
+  orderId         String
+  productId       String
+  quantity        Int
+  totalSalesPrice Decimal
 
   order   Order   @relation(fields: [orderId], references: [id])
   product Product @relation(fields: [productId], references: [id])
@@ -134,8 +149,22 @@ model OrderLines {
   @@unique([orderId, productId])
 }
 
-model dailyReport {
-  id        String @id @default(uuid())
-  date      DateTime
-  
+model DailyReport {
+  id                  String  @id @default(uuid())
+  totalOrders         Int
+  totalProductsSold   Int
+  totalSales          Decimal
+  totalCost           Decimal
+  totalCashSales      Decimal
+  totalCardSales      Decimal
+  totalDigitalSales   Decimal
+  totalProfit         Decimal
+  bestSellingProduct  String
+  leastSellingProduct String
+
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
