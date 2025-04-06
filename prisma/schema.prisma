@@ -19,22 +19,21 @@ enum Status {
 }
 
 enum PaymentMethod {
-  CREDIT_CARD
-  DEBIT_CARD
-  DIGITAL
-  CASH
+CARD
+DIGITAL
+CASH
 }
 
 enum OrderStatus {
-  PENDIENTE
-  PAGADA
-  ANULADA
+  PAID
+  PENDING
+  CANCELED
 }
 
 enum ProductStatus {
-  DISPONIBLE
-  ESCASO
-  AGOTADO
+  AVAILABLE
+  LIMITED
+  SOLDOUT
 }
 
 model UserType {
@@ -91,7 +90,7 @@ model Product {
   stock_min     Int
   imagePath     String?
   description   String?
-  status        ProductStatus @default(DISPONIBLE)
+  status        ProductStatus @default(LIMITED)
 
   orderItems OrderLines[]
 
@@ -110,7 +109,7 @@ model Order {
   paymentId      String?
   payment        Payment?    @relation(fields: [paymentId], references: [id])
   pdfPath        String?
-  status         OrderStatus @default(PENDIENTE)
+  status         OrderStatus @default(PENDING)
 
   orderItems OrderLines[]
 
@@ -131,7 +130,7 @@ model Discount {
 
 model Payment {
   id   String @id @default(uuid())
-  name String
+  name PaymentMethod @default(CASH)
 
   orders Order[]
 }
