@@ -65,7 +65,7 @@ model Store {
   id      String @id @default(uuid())
   name    String
   address String
-  tel     String
+  tel     String?
   status  Status @default(ACTIVE)
 
   userID String
@@ -84,12 +84,12 @@ model Product {
   storeId       String
   store         Store         @relation(fields: [storeId], references: [id])
   name          String
-  salesPrice    Decimal
-  costPrice     Decimal
+  salesPrice    Decimal       @db.Decimal(9, 2)
+  costPrice     Decimal       @db.Decimal(9, 2)
   stock         Int
   stock_optimus Int
   stock_min     Int
-  image         String?
+  imagePath     String?
   description   String?
   status        ProductStatus @default(DISPONIBLE)
 
@@ -103,13 +103,13 @@ model Order {
   id             String      @id @default(uuid())
   storeId        String
   store          Store       @relation(fields: [storeId], references: [id])
-  subTotalAmount Decimal
+  subTotalAmount Decimal     @db.Decimal(10, 2)
   discountID     String?
   discount       Discount?   @relation(fields: [discountID], references: [id])
-  totalAmount    Decimal
+  totalAmount    Decimal     @db.Decimal(10, 2)
   paymentId      String?
   payment        Payment?    @relation(fields: [paymentId], references: [id])
-  pdf            String?
+  pdfPath        String?
   status         OrderStatus @default(PENDIENTE)
 
   orderItems OrderLines[]
@@ -121,7 +121,7 @@ model Order {
 model Discount {
   id          String  @id @default(uuid())
   description String
-  rate        Decimal
+  rate        Decimal @db.Decimal(5, 2)
 
   orders Order[]
 
@@ -141,7 +141,7 @@ model OrderLines {
   orderId         String
   productId       String
   quantity        Int
-  totalSalesPrice Decimal
+  totalSalesPrice Decimal @db.Decimal(9, 2)
 
   order   Order   @relation(fields: [orderId], references: [id])
   product Product @relation(fields: [productId], references: [id])
@@ -151,16 +151,16 @@ model OrderLines {
 
 model DailyReport {
   id                  String  @id @default(uuid())
-  totalOrders         Int
-  totalProductsSold   Int
-  totalSales          Decimal
-  totalCost           Decimal
-  totalCashSales      Decimal
-  totalCardSales      Decimal
-  totalDigitalSales   Decimal
-  totalProfit         Decimal
-  bestSellingProduct  String
-  leastSellingProduct String
+  totalOrders         Int @default(0)
+  totalProductsSold   Int @default(0)
+  totalSales          Decimal @default(0.0) @db.Decimal(13, 2)
+  totalCost           Decimal @default(0.0) @db.Decimal(13, 2)
+  totalCashSales      Decimal @default(0.0) @db.Decimal(13, 2)
+  totalCardSales      Decimal @default(0.0) @db.Decimal(13, 2)
+  totalDigitalSales   Decimal @default(0.0) @db.Decimal(13, 2)
+  totalProfit         Decimal @db.Decimal(13, 2)
+  bestSellingProduct  String?
+  leastSellingProduct String?
 
   storeId String
   store   Store  @relation(fields: [storeId], references: [id])
