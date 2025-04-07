@@ -1,6 +1,16 @@
+// middleware.ts
 import { NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
 
+export const config = {
+  matcher: ['/api/:path*'],
+};
+
+export function middleware() {
+  console.log('Middleware ejecutado');
+  return NextResponse.next();
+}
+
+/* chatgtp dice: 
 export function middleware(req) {
   const { pathname } = req.nextUrl;
   const token = req.cookies.get('token')?.value;
@@ -46,3 +56,4 @@ export function middleware(req) {
 export const config = {
   matcher: ['/api/:path*'],
 };
+*/
