@@ -4,17 +4,31 @@ para que el navegador lo guarde en una cookie
 */
 
 import { NextResponse } from 'next/server';
+import jwt from 'jsonwebtoken';
+
+// app/api/login/route.js
+import { NextResponse } from 'next/server';
+import jwt from 'jsonwebtoken';
+
+const SECRET = 'mi_clave_secreta_ultra_segura';
 
 export async function POST(req) {
-  const body = await req.json();
-  const { email, password } = body;
+  const { email, password } = await req.json();
 
-  // Acá iría tu lógica de autenticación y generación de token
+  if (email === 'admin@admin.com' && password === '1234') {
+    const token = jwt.sign({ email }, process.env.SECRET_KEY, { expiresIn: '1h' });
+    return NextResponse.json({
+      status: 'OK',
+      token,
+      message: 'Usuario autenticado correctamente',
+    });
+  }
 
-  return NextResponse.json({
-    status: 'OK',
-    email,
-    password,
-    message: 'El usuario se logueó correctamente',
-  });
+  return NextResponse.json(
+    {
+      status: 'ERROR',
+      message: 'Credenciales inválidas',
+    },
+    { status: 401 }
+  );
 }
