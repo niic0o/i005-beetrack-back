@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Backend de Beetrack
 
-## Getting Started
+## Para probar localmente
 
-First, run the development server:
+### - Clonar el repositorio:
 
 ```bash
+git clone https://github.com/IgrowkerTraining/i005-beetrack-back.git
+```
+### - Instalar las dependencias:
+```bash
+npm install
+```
+### - Crear un archivo .env en la raiz del proyecto con las variables del .env.example.
+
+### - Correr el proyecto en modo de  desarrollo:
+```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+### La API estará corriendo en http://localhost:3000
+
+# API de Beetrack
+
+## Endpoints
+
+| Método | Ruta              | Descripción                          | Body requerido                                     | Respuestas posibles                           |
+|--------|-------------------|--------------------------------------|---------------------------------------------------|----------------------------------------------|
+| POST   | `/api/auth/register` | Registra un nuevo usuario            | Ver ejemplo abajo    | `201 OK` Usuario creado<br>`400` Error de validación<br>`500` Error interno |
+| POST   | `/api/auth/login`    | Crea la cookie con el token           | `{ "email": string, "password": string }`         | `200 OK` Login exitoso<br>`400/401` Error credenciales<br>`500` Error interno |
+| POST   | `/api/auth/logout`   | Destruye la cookie        | _Sin body_                                        | `202 OK` Logout exitoso<br>`500` Error interno |
+
+## Ejemplo de Body para /api/auth/register
+```json
+{
+    "name": "Juan",
+    "last_name": "Pérez",
+    "email": "example@email.com",
+    "birthdate": "1985-05-02",
+    "password": "1234"
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Autenticación
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- El token JWT se entrega en una cookie con las siguientes características:
+  - `httpOnly: true`
+  - `secure: true` (en producción)
+  - `sameSite: 'lax'`
+  - `maxAge: 1 día` 
+  - `path: '/'`
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Notas
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- Como todavía no se van a implementar roles desde el frontend, los usuarios se crean con un rol "admin" por defecto.

@@ -37,7 +37,7 @@ enum ProductStatus {
 }
 
 model UserType {
-  userTypeID String @id @default(cuid())
+  id String @id @default(cuid())
   role       String
 
   Users User[]
@@ -46,7 +46,7 @@ model UserType {
 model User {
   id         String   @id @default(uuid())
   userTypeID String
-  userType   UserType @relation(fields: [userTypeID], references: [userTypeID])
+  userType   UserType @relation(fields: [userTypeID], references: [id])
   name       String
   last_name  String
   birthdate  DateTime
