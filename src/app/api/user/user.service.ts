@@ -1,4 +1,8 @@
 import { prisma } from '@/lib/prisma';
+import {
+  getUserTypeByRole,
+  createUserType,
+} from '../userTypes/userTypes.service';
 import { CreateUserRequestDtoType } from './DTOs/createUserRequestDto';
 import { toCreateUserResponseDto } from './Mappers/toCreateUserResponseDto';
 import { createHash } from './utils';
@@ -21,9 +25,7 @@ export const getUserByEmail = async (email: string) => {
 
 export const createUser = async (user: CreateUserRequestDtoType) => {
   try {
-    console.log('Creating user with data:', user);
-
-    const { userTypeID, name, last_name, email, birthdate, password } = user;
+    const { name, last_name, email, birthdate, password } = user;
     const userFound = await getUserByEmail(email);
     if (userFound) {
       throw new Error('User already exists');
@@ -33,9 +35,16 @@ export const createUser = async (user: CreateUserRequestDtoType) => {
 
     const parsedDate = new Date(birthdate);
 
+    //Por defecto el rol es admin, eventualmente se pueden agregar mas roles y pedir el campo "rol" en el cuerpo de la solicitud
+    let userType;
+    const userTypeFound = await getUserTypeByRole('admin');
+    userTypeFound
+      ? (userType = userTypeFound.id)
+      : (userType = (await createUserType('admin')).id);
+
     const userCreated = await prisma.user.create({
       data: {
-        userTypeID,
+        userTypeID: userType,
         name,
         last_name,
         email,

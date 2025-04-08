@@ -4,7 +4,7 @@ import { createUserRequestDto } from './createUserRequestDto';
 export const createUserResponseDto = createUserRequestDto
   .omit({
     password: true,
-    userTypeID: true,
+    // userTypeID: true,
   })
   .extend({
     id: z.string(),

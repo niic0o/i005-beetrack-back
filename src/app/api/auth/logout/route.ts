@@ -7,7 +7,7 @@ export async function POST() {
         status: "OK",
         message: "Sesión cerrada correctamente",
       },
-      { status: 200 }
+      { status: 204 }
     );
 
     response.cookies.delete("token");
