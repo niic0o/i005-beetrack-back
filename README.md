@@ -27,7 +27,7 @@ npm run dev
 |--------|-------------------|--------------------------------------|---------------------------------------------------|----------------------------------------------|
 | POST   | `/api/auth/register` | Registra un nuevo usuario            | Ver ejemplo abajo    | `201 OK` Usuario creado<br>`400` Error de validación<br>`500` Error interno |
 | POST   | `/api/auth/login`    | Crea la cookie con el token           | `{ "email": string, "password": string }`         | `200 OK` Login exitoso<br>`400/401` Error credenciales<br>`500` Error interno |
-| POST   | `/api/auth/logout`   | Destruye la cookie        | _Sin body_                                        | `204 No-Content` Logout exitoso<br>`500` Error interno |
+| POST   | `/api/auth/logout`   | Destruye la cookie        | _Sin body_                                        | `202 OK` Logout exitoso<br>`500` Error interno |
 
 ## Ejemplo de Body para /api/auth/register
 ```json
