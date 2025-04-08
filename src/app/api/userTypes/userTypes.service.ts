@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma';
 
 export const getUserTypeByRole = async (role: string) => {
   try {
-    const userTypeFound = await prisma.userType.findUnique({
+    const userTypeFound = await prisma.userType.findFirst({
       where: {
         role,
       },
