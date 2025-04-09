@@ -1,5 +1,19 @@
+/*
+Esta es la estructura de carpetas:
+/app
+  /api
+    /dashboard
+      route.ts               ← Tu handler HTTP (GET, POST, etc.)
+      types.ts               ← (Opcional) DTOs o Tipos específicos del endpoint
+/lib
+  /dashboard
+    dashboardService.ts      ← Toda la lógica de negocio del dashboard
+    dashboard.mapper.ts      ← Mappers para adaptar datos (ej: de Prisma → DTO)
+    dashboard.dto.ts         ← DTOs para validar inputs (ej: con Zod)
+*/
+
 import { NextRequest, NextResponse } from 'next/server';
-import { getSummaryByDate, getSummaryByRange, getComparison } from '@/lib/dashboardService';
+import { getSummaryByDate, getSummaryByRange, getComparison } from '@/lib/dashboard/dashboardService';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
