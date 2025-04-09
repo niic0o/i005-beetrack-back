@@ -5,44 +5,53 @@ Esta es la estructura de carpetas:
     /dashboard
       route.ts               ← Tu handler HTTP (GET, POST, etc.)
       types.ts               ← (Opcional) DTOs o Tipos específicos del endpoint
-/lib
-  /dashboard
-    dashboardService.ts      ← Toda la lógica de negocio del dashboard
-    dashboard.mapper.ts      ← Mappers para adaptar datos (ej: de Prisma → DTO)
-    dashboard.dto.ts         ← DTOs para validar inputs (ej: con Zod)
+
+    /lib/dashboard/
+├── dashboardService.ts        ← Lógica principal (`getDashboardData`)
+├── dashboard.dto.ts           ← Zod schemas para validar input
+├── dashboard.mapper.ts        ← Transforma datos de Prisma a respuesta (opcional)
+├── dashboard.utils.ts         ← Función `aggregate()`, helpers de fecha
+
+    ✅ ¿Qué va en cada uno?
+route.ts: recibe la request, valida con Zod, y llama a dashboardService.
+
+dashboardService.ts: hace toda la lógica (consultas, cálculos, etc.).
+
+dashboard.mapper.ts: transforma modelos Prisma en objetos listos para devolver al frontend.
+
+dashboard.dto.ts: define y valida inputs esperados desde el frontend (view, fechas, etc.).
 */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getSummaryByDate, getSummaryByRange, getComparison } from '@/lib/dashboard/dashboardService';
+// app/api/dashboard/route.ts
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const view = searchParams.get('view');
-  const date = searchParams.get('date');
-  const start = searchParams.get('start');
-  const end = searchParams.get('end');
-  const date1 = searchParams.get('date1');
-  const date2 = searchParams.get('date2');
+import { NextResponse } from "next/server";
+import { getDashboardData } from "@/lib/dashboard/dashboard.service";
+import { dashboardQuerySchema } from "./dto";
+
+export async function GET(req: Request) {
+  const url = new URL(req.url);
+  const params = Object.fromEntries(url.searchParams.entries());
+
+  const parse = dashboardQuerySchema.safeParse(params);
+  if (!parse.success) {
+    return NextResponse.json({ error: parse.error.format() }, { status: 400 });
+  }
+
+  const { storeId, view, date, fromDate, toDate } = parse.data;
 
   try {
-    if (view === 'daily' && date) {
-      const data = await getSummaryByDate(new Date(date));
-      return NextResponse.json(data);
-    }
+    const result = await getDashboardData({
+      storeId,
+      view,
+      date: date ? new Date(date) : undefined,
+      fromDate: fromDate ? new Date(fromDate) : undefined,
+      toDate: toDate ? new Date(toDate) : undefined,
+    });
 
-    if (view === 'range' && start && end) {
-      const data = await getSummaryByRange(new Date(start), new Date(end));
-      return NextResponse.json(data);
-    }
-
-    if (view === 'compare' && date1 && date2) {
-      const data = await getComparison(new Date(date1), new Date(date2));
-      return NextResponse.json(data);
-    }
-
-    return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 });
+    return NextResponse.json(result);
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: "Error al obtener dashboard" }, { status: 500 });
   }
 }
+
