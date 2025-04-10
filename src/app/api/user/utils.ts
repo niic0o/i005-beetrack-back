@@ -11,9 +11,8 @@ export const compareHash = async (user: User, password: string) => {
   return await bcrypt.compare(password, user.password);
 };
 
-export const generateToken = (email: string): string => {
+export const generateToken = (userId: string, storeId: string, name: string): string => {
   const secret = process.env.SECRET_KEY;
   if (!secret) throw new Error('SECRET_KEY no definida');
-
-  return jwt.sign({ email }, secret, { expiresIn: '24h' });
+  return jwt.sign({ userId, storeId, name }, secret, { expiresIn: '24h' });
 };
