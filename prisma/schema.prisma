@@ -89,6 +89,7 @@ model Product {
   stock_optimus Int
   stock_min     Int
   imagePath     String?
+  cloudinary_id String?
   description   String?
   status        ProductStatus @default(LIMITED)
 
