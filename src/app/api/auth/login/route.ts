@@ -97,8 +97,9 @@ Manejo el error si los hubiera
 export async function POST(req: NextRequest) {
   try {
     const { email, password } = await validateRequestBody(req);
-    await authenticateUser(email, password);
-    const token = generateToken(email);
+    const user = await authenticateUser(email, password);
+    //Ojo, funciona solo si el usuario tiene una sola tienda.
+    const token = generateToken(user.id, user.stores[0].id, user.name);
     return sendAuthResponse(token);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Error desconocido';

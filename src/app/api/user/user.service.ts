@@ -10,8 +10,9 @@ import { createHash } from './utils';
 export const getUserByEmail = async (email: string) => {
   try {
     const userFound = await prisma.user.findUnique({
-      where: {
-        email,
+      where: { email },
+      include: {
+        stores: true, // Esto trae las tiendas asociadas al usuario
       },
     });
     return userFound;
@@ -19,7 +20,7 @@ export const getUserByEmail = async (email: string) => {
     if (error instanceof Error) {
       throw new Error(error.message);
     }
-    throw new Error('Internal server error');
+    throw new Error('Error interno del servidor');
   }
 };
 
