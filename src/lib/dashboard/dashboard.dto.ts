@@ -1,5 +1,12 @@
 // lib/dashboard/dashboard.dto.ts
-
+/**
+ * Este DTO expone la estructura de datos que entran y salen sin conocer los esquemas de la base de datos.
+ * Estos esquemas pueden variar en el tiempo o exponer vulnerabilidades, la intención es proteger la capa de datos.
+ * @function DashboardCompareData permite comparar datos procesados en dos rangos de misma amplitud
+ * @function AggregatedReport permite conocer la sumatoria de datos procesados en x rangos de fecha
+ * @function DashboardParams define la estructura de datos que espera recibir por el metodo http GET req.params
+ * @type {ViewType} permite definir el tipo de vista que se va a renderizar
+ */
 export type ViewType = "daily" | "range" | "compare";
 
 export interface DashboardParams {

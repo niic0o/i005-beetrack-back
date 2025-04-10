@@ -3,6 +3,9 @@
 import { AggregatedReport } from "../dashboard.dto";
 import { DailyReport } from "@prisma/client";
 
+/**
+ * @exports mapDailyReportToAggregated devuelve un objeto con los datos de un reporte diario
+ */
 export const mapDailyReportToAggregated = (report: DailyReport): AggregatedReport => {
   return {
     totalSales: Number(report.totalSales),

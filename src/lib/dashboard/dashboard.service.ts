@@ -13,6 +13,25 @@ import { startOfDay, endOfDay, cloneDate } from "./utils/date";
 
 const prisma = new PrismaClient();
 
+/**
+ * Función principal que obtiene los datos necesarios para el dashboard
+ * según el tipo de vista solicitado por el cliente (`daily`, `range` o `compare`).
+ *
+ * @param storeId - ID de la tienda.
+ * @param view - Tipo de vista solicitada: 
+ *    - `"daily"`: reporte de un único día (requiere `date`).
+ *    - `"range"`: reporte agregado en un rango de fechas (requiere `fromDate` y `toDate`).
+ *    - `"compare"`: compara dos rangos de fechas equivalentes (requiere `fromDate` y `toDate`).
+ * @param date - Fecha específica para vista `"daily"`.
+ * @param fromDate - Fecha inicial del rango (inclusive) para `"range"` o `"compare"`.
+ * @param toDate - Fecha final del rango (inclusive) para `"range"` o `"compare"`.
+ *
+ * @returns Datos procesados del dashboard en formato agregado. En caso de vista `"compare"`, 
+ * devuelve tanto los datos actuales como los del rango anterior.
+ *
+ * @throws Error si faltan parámetros requeridos según la vista seleccionada, o si la vista no es válida.
+ */
+
 export const getDashboardData = async ({ storeId, view, date, fromDate, toDate }: DashboardParams): Promise<DashboardData> => {
   switch (view) {
     case "daily":

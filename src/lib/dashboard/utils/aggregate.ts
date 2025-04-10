@@ -2,7 +2,11 @@
 
 import { AggregatedReport } from "../dashboard.dto";
 import { DailyReport } from "@prisma/client";
-
+/**
+ * 
+ * @param reports recibe un arreglo con los registros de la tabla DailyReport en el rango de fechas indicado
+ * @returns devuelve un procesamiento matematico de sumarizar todas las variables de los reportes en el rango indicado
+ */
 export const aggregateReports = (reports: DailyReport[]): AggregatedReport => {
   return reports.reduce(
     (acc, curr) => {

@@ -28,6 +28,11 @@ import { NextResponse } from "next/server";
 import { getDashboardData } from "@/lib/dashboard/dashboard.service";
 import { dashboardQuerySchema } from "./dto";
 
+/**
+  Funcion que permite obtener reportes estadísticos del comercio
+ * @param req recibe por solicitud tienda id, tipo de reporte, date?, fromDate? y toDate?
+ * @returns devuelve un objeto json con los datos solicitados
+ */
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const params = Object.fromEntries(url.searchParams.entries());
