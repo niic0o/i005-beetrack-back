@@ -6,11 +6,15 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_SECRET_KEY,
 });
 
-export async function uploadFile(filePath: string) {
+export async function uploadFile(filePath: string, folder: string) {
   return await cloudinary.uploader.upload(filePath, {
-    folder: 'beetrack',
+    folder: `beetrack/${folder}`,
     use_filename: true,
     resource_type: 'auto',
+    width: 600,
+    height: 600,
+    crop: 'fill',
+    quality: 'auto',
   });
 }
 
