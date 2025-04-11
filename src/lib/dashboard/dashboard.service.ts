@@ -6,6 +6,8 @@ import {
   DashboardData,
   AggregatedReport,
   DashboardCompareData,
+  DashboardTopData,
+  TopProduct,
 } from "./dashboard.dto";
 import { mapDailyReportToAggregated } from "./mappers/dailyMapper";
 import { aggregateReports } from "./utils/aggregate";
@@ -18,7 +20,7 @@ const prisma = new PrismaClient();
  * según el tipo de vista solicitado por el cliente (`daily`, `range` o `compare`).
  *
  * @param storeId - ID de la tienda.
- * @param view - Tipo de vista solicitada: 
+ * @param view - Tipo de vista solicitada:
  *    - `"daily"`: reporte de un único día (requiere `date`).
  *    - `"range"`: reporte agregado en un rango de fechas (requiere `fromDate` y `toDate`).
  *    - `"compare"`: compara dos rangos de fechas equivalentes (requiere `fromDate` y `toDate`).
@@ -26,13 +28,19 @@ const prisma = new PrismaClient();
  * @param fromDate - Fecha inicial del rango (inclusive) para `"range"` o `"compare"`.
  * @param toDate - Fecha final del rango (inclusive) para `"range"` o `"compare"`.
  *
- * @returns Datos procesados del dashboard en formato agregado. En caso de vista `"compare"`, 
+ * @returns Datos procesados del dashboard en formato agregado. En caso de vista `"compare"`,
  * devuelve tanto los datos actuales como los del rango anterior.
  *
  * @throws Error si faltan parámetros requeridos según la vista seleccionada, o si la vista no es válida.
  */
 
-export const getDashboardData = async ({ storeId, view, date, fromDate, toDate }: DashboardParams): Promise<DashboardData> => {
+export const getDashboardData = async ({
+  storeId,
+  view,
+  date,
+  fromDate,
+  toDate,
+}: DashboardParams): Promise<DashboardData> => {
   switch (view) {
     case "daily":
       if (!date) throw new Error("Se requiere 'date' para la vista diaria");
@@ -50,7 +58,10 @@ export const getDashboardData = async ({ storeId, view, date, fromDate, toDate }
       return dailyReport ? mapDailyReportToAggregated(dailyReport) : null;
 
     case "range":
-      if (!fromDate || !toDate) throw new Error("Se requieren 'fromDate' y 'toDate' para vista de rango");
+      if (!fromDate || !toDate)
+        throw new Error(
+          "Se requieren 'fromDate' y 'toDate' para vista de rango"
+        );
 
       const rangeReports = await prisma.dailyReport.findMany({
         where: {
@@ -65,7 +76,10 @@ export const getDashboardData = async ({ storeId, view, date, fromDate, toDate }
       return aggregateReports(rangeReports);
 
     case "compare":
-      if (!fromDate || !toDate) throw new Error("Se requieren 'fromDate' y 'toDate' para vista comparativa");
+      if (!fromDate || !toDate)
+        throw new Error(
+          "Se requieren 'fromDate' y 'toDate' para vista comparativa"
+        );
 
       const rangeLength = toDate.getTime() - fromDate.getTime();
       const previousToDate = new Date(cloneDate(fromDate).getTime() - 1);
@@ -97,9 +111,54 @@ export const getDashboardData = async ({ storeId, view, date, fromDate, toDate }
         previous: aggregateReports(previousReports),
       } satisfies DashboardCompareData;
 
+    case "top":
+      if (!fromDate || !toDate)
+        throw new Error(
+          "Se requieren 'fromDate' y 'toDate' para vista de top productos"
+        );
+
+      const topProducts = await prisma.orderLines.groupBy({
+        by: ["productId"],
+        where: {
+          order: {
+            storeId,
+            createdAt: {
+              gte: startOfDay(fromDate),
+              lte: endOfDay(toDate),
+            },
+          },
+        },
+        _sum: {
+          quantity: true,
+        },
+        orderBy: {
+          _sum: {
+            quantity: "desc",
+          },
+        },
+        take: 10,
+      });
+
+      const topWithDetails = await Promise.all(
+        topProducts.map(async (item) => {
+          const product = await prisma.product.findUnique({
+            where: { id: item.productId },
+          });
+
+          if (!product) return null;
+
+          return {
+            ...product,
+            totalSold: item._sum.quantity || 0,
+          };
+        })
+      );
+
+      // Filtramos nulos en caso de productos eliminados
+      return {
+        topProducts: topWithDetails.filter((p): p is TopProduct => p !== null),
+      } satisfies DashboardTopData;
     default:
       throw new Error("Vista inválida");
   }
 };
-
-
