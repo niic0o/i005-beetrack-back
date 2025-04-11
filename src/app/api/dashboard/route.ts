@@ -1,18 +1,4 @@
 /*
-Esta es la estructura de carpetas:
-/app
-  /api
-    /dashboard
-      route.ts               ← Tu handler HTTP (GET, POST, etc.)
-      types.ts               ← (Opcional) DTOs o Tipos específicos del endpoint
-
-    /lib/dashboard/
-├── dashboardService.ts        ← Lógica principal (`getDashboardData`)
-├── dashboard.dto.ts           ← Zod schemas para validar input
-├── dashboard.mapper.ts        ← Transforma datos de Prisma a respuesta (opcional)
-├── dashboard.utils.ts         ← Función `aggregate()`, helpers de fecha
-
-    ✅ ¿Qué va en cada uno?
 route.ts: recibe la request, valida con Zod, y llama a dashboardService.
 
 dashboardService.ts: hace toda la lógica (consultas, cálculos, etc.).
@@ -43,6 +29,8 @@ export async function GET(req: Request) {
   }
 
   const { storeId, view, date, fromDate, toDate } = parse.data;
+
+  console.log("Request dashboard", { storeId, view, date, fromDate, toDate }); //para debuggear
 
   try {
     const result = await getDashboardData({
