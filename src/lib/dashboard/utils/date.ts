@@ -13,3 +13,20 @@ export const startOfDay = (date: Date): Date => new Date(date.setHours(0, 0, 0, 
 export const endOfDay = (date: Date): Date => new Date(date.setHours(23, 59, 59, 999));
 
 export const cloneDate = (date: Date): Date => new Date(date.getTime());
+
+export const startOfLocalDay = (date: Date) => {
+    const local = new Date(date);
+    local.setHours(0, 0, 0, 0); // 00:00:00.000 en horario local
+    return local;
+  };
+  
+  export const endOfLocalDay = (date: Date) => {
+    const local = new Date(date);
+    local.setHours(23, 59, 59, 999); // 23:59:59.999 en horario local
+    return local;
+  };
+
+  export const parseLocalDate = (dateStr: string): Date => {
+    const [year, month, day] = dateStr.split("-").map(Number);
+    return new Date(year, month - 1, day); // OJO: los meses en JS van de 0 a 11
+  };

@@ -11,7 +11,7 @@ import {
 } from "./dashboard.dto";
 import { mapDailyReportToAggregated } from "./mappers/dailyMapper";
 import { aggregateReports } from "./utils/aggregate";
-import { startOfDay, endOfDay, cloneDate } from "./utils/date";
+import { startOfDay, endOfDay, cloneDate, startOfLocalDay, endOfLocalDay } from "./utils/date";
 
 const prisma = new PrismaClient();
 
@@ -92,54 +92,59 @@ export const getDashboardData = async ({
         previous: aggregateReports(previousReports),
       } satisfies DashboardCompareData;
 
-    case "top":
-      if (!fromDate || !toDate)
-        throw new Error(
-          "Se requieren 'fromDate' y 'toDate' para vista de top productos"
-        );
-
-      const topProducts = await prisma.orderLines.groupBy({
-        by: ["productId"],
-        where: {
-          order: {
-            storeId,
-            createdAt: {
-              gte: startOfDay(fromDate),
-              lte: endOfDay(toDate),
+      case "top":
+        if ((!fromDate || !toDate) && date) {
+          fromDate = startOfLocalDay(date);
+          toDate = endOfLocalDay(date);
+        }
+  
+        if (!fromDate || !toDate)
+          throw new Error(
+            "Se requiere 'date' o 'fromDate' y 'toDate' para vista de top productos"
+          );
+  
+        const topProducts = await prisma.orderLines.groupBy({
+          by: ["productId"],
+          where: {
+            order: {
+              storeId,
+              createdAt: {
+                gte: fromDate,
+                lte: toDate
+              },
             },
           },
-        },
-        _sum: {
-          quantity: true,
-          totalSalesPrice: true
-        },
-        orderBy: {
           _sum: {
-            quantity: "desc",
+            quantity: true,
+            totalSalesPrice: true,
           },
-        },
-        take: 10,
-      });
-
-      const topWithDetails = await Promise.all(
-        topProducts.map(async (item) => {
-          const product = await prisma.product.findUnique({
-            where: { id: item.productId },
-          });
-
-          if (!product) return null;
-
-          return {
-            ...product,
-            totalSold: item._sum.quantity || 0,
-            totalRevenue: item._sum.totalSalesPrice || 0, // Nueva propiedad: facturación total
-          };
-        })
-      );
-
-      return {
-        topProducts: topWithDetails.filter((p): p is TopProduct => p !== null),
-      } satisfies DashboardTopData;
+          orderBy: {
+            _sum: {
+              quantity: "desc",
+            },
+          },
+          take: 10,
+        });
+  
+        const topWithDetails = await Promise.all(
+          topProducts.map(async (item) => {
+            const product = await prisma.product.findUnique({
+              where: { id: item.productId },
+            });
+  
+            if (!product) return null;
+  
+            return {
+              ...product,
+              totalSold: item._sum.quantity || 0,
+              totalRevenue: item._sum.totalSalesPrice || 0,
+            };
+          })
+        );
+  
+        return {
+          topProducts: topWithDetails.filter((p): p is TopProduct => p !== null),
+        } satisfies DashboardTopData;
 
     default:
       throw new Error("Vista inválida");

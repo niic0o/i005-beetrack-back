@@ -13,6 +13,7 @@ dashboard.dto.ts: define y valida inputs esperados desde el frontend (view, fech
 import { NextResponse } from "next/server";
 import { getDashboardData } from "@/lib/dashboard/dashboard.service";
 import { dashboardQuerySchema } from "./dto";
+import { parseLocalDate } from "@/lib/dashboard/utils/date";
 
 /**
   Funcion que permite obtener reportes estadísticos del comercio
@@ -36,9 +37,9 @@ export async function GET(req: Request) {
     const result = await getDashboardData({
       storeId,
       view,
-      date: date ? new Date(date) : undefined,
-      fromDate: fromDate ? new Date(fromDate) : undefined,
-      toDate: toDate ? new Date(toDate) : undefined,
+      date: date ? parseLocalDate(date) : undefined,
+      fromDate: fromDate ? parseLocalDate(fromDate) : undefined,
+      toDate: toDate ? parseLocalDate(toDate) : undefined,
     });
 
     return NextResponse.json(result);
