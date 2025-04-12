@@ -41,11 +41,23 @@ export const writeFile = async (file: File) => {
 export const removeFile = (filePath: string) => {
   fs.unlink(filePath, (err) => {
     if (err) {
-      console.error('Error al eliminar el archivo:', err);
       throw new Error('Error al eliminar el archivo');
     } else {
-      console.log('Archivo eliminado con éxito');
       return null;
     }
   });
+};
+
+export const setProductStatus = (stock: number, stock_min: number): string => {
+  if (stock === 0) {
+    return 'SOLDOUT';
+  } else if (stock < stock_min) {
+    return 'LIMITED';
+  } else {
+    return 'AVAILABLE';
+  }
+};
+
+export const isValidFile = (file: unknown): file is File => {
+  return file instanceof File;
 };

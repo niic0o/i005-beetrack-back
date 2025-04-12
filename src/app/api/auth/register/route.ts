@@ -1,6 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createUser } from '../../user/user.service';
-import { generateToken } from '../../user/utils';
+import { NextRequest } from 'next/server';
+import { createUser } from '../../users/user.service';
+import { generateToken } from '../../users/utils';
+import { successResponse } from '@/lib/responses';
+import { handleError } from '@/lib/errorHandler';
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,10 +12,7 @@ export async function POST(req: NextRequest) {
 
     const token = generateToken(newUser.email);
 
-    const response = NextResponse.json(
-      { status: 'OK', message: 'Usuario creado exitosamente' },
-      { status: 201 }
-    );
+    const response = successResponse('Usuario creado correctamente', 201);
     response.cookies.set({
       name: 'token',
       value: token,
@@ -26,19 +25,6 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (error) {
-    if (error instanceof Error) {
-      return NextResponse.json(
-        {
-          message: error.message,
-        },
-        { status: 400 }
-      );
-    }
-    return NextResponse.json(
-      {
-        message: 'Internal server error',
-      },
-      { status: 500 }
-    );
+    handleError(error);
   }
 }
