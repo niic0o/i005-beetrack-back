@@ -11,7 +11,13 @@ import {
 } from "./dashboard.dto";
 import { mapDailyReportToAggregated } from "./mappers/dailyMapper";
 import { aggregateReports } from "./utils/aggregate";
-import { startOfDay, endOfDay, cloneDate, startOfLocalDay, endOfLocalDay } from "./utils/date";
+import {
+  startOfDay,
+  endOfDay,
+  cloneDate,
+  startOfLocalDay,
+  endOfLocalDay,
+} from "./utils/date";
 
 const prisma = new PrismaClient();
 
@@ -30,8 +36,8 @@ export const getDashboardData = async ({
         where: {
           storeId,
           createdAt: {
-            gte: startOfDay(date),
-            lt: endOfDay(cloneDate(date)),
+            gte: startOfLocalDay(date),
+            lt: endOfLocalDay(date),
           },
         },
       });
@@ -48,14 +54,74 @@ export const getDashboardData = async ({
         where: {
           storeId,
           createdAt: {
-            gte: startOfDay(fromDate),
-            lte: endOfDay(toDate),
+            gte: startOfLocalDay(fromDate),
+            lte: endOfLocalDay(toDate),
           },
         },
       });
 
       return aggregateReports(rangeReports);
+    case "top":
+      if ((!fromDate || !toDate) && date) {
+        fromDate = startOfLocalDay(date);
+        toDate = endOfLocalDay(date);
+      }
 
+      if (fromDate && toDate) {
+        fromDate = startOfLocalDay(fromDate);
+        toDate = endOfLocalDay(toDate);
+      }
+
+      if (!fromDate || !toDate)
+        throw new Error(
+          "Se requiere 'date' o 'fromDate' y 'toDate' para vista de top productos"
+        );
+
+      const topProducts = await prisma.orderLines.groupBy({
+        by: ["productId"],
+        where: {
+          order: {
+            storeId,
+            createdAt: {
+              gte: fromDate,
+              lte: toDate,
+            },
+          },
+        },
+        _sum: {
+          quantity: true,
+          totalSalesPrice: true,
+        },
+        orderBy: {
+          _sum: {
+            quantity: "desc",
+          },
+        },
+        take: 10,
+      });
+
+      const topWithDetails = await Promise.all(
+        topProducts.map(async (item) => {
+          const product = await prisma.product.findUnique({
+            where: { id: item.productId },
+          });
+
+          if (!product) return null;
+
+          return {
+            ...product,
+            totalSold: item._sum.quantity || 0,
+            totalRevenue: item._sum.totalSalesPrice || 0,
+          };
+        })
+      );
+
+      return {
+        topProducts: topWithDetails.filter((p): p is TopProduct => p !== null),
+      } satisfies DashboardTopData;
+
+    /*
+    Esta funcionalidad necesita revision!!
     case "compare":
       if (!fromDate || !toDate)
         throw new Error(
@@ -91,63 +157,9 @@ export const getDashboardData = async ({
         current: aggregateReports(currentReports),
         previous: aggregateReports(previousReports),
       } satisfies DashboardCompareData;
-
-      case "top":
-        if ((!fromDate || !toDate) && date) {
-          fromDate = startOfLocalDay(date);
-          toDate = endOfLocalDay(date);
-        }
-  
-        if (!fromDate || !toDate)
-          throw new Error(
-            "Se requiere 'date' o 'fromDate' y 'toDate' para vista de top productos"
-          );
-  
-        const topProducts = await prisma.orderLines.groupBy({
-          by: ["productId"],
-          where: {
-            order: {
-              storeId,
-              createdAt: {
-                gte: fromDate,
-                lte: toDate
-              },
-            },
-          },
-          _sum: {
-            quantity: true,
-            totalSalesPrice: true,
-          },
-          orderBy: {
-            _sum: {
-              quantity: "desc",
-            },
-          },
-          take: 10,
-        });
-  
-        const topWithDetails = await Promise.all(
-          topProducts.map(async (item) => {
-            const product = await prisma.product.findUnique({
-              where: { id: item.productId },
-            });
-  
-            if (!product) return null;
-  
-            return {
-              ...product,
-              totalSold: item._sum.quantity || 0,
-              totalRevenue: item._sum.totalSalesPrice || 0,
-            };
-          })
-        );
-  
-        return {
-          topProducts: topWithDetails.filter((p): p is TopProduct => p !== null),
-        } satisfies DashboardTopData;
+      */
 
     default:
       throw new Error("Vista inválida");
   }
 };
-
