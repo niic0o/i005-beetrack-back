@@ -11,6 +11,7 @@ export const createProductRequestDto = z.object({
   imagePath: z.string(),
   cloudinary_id: z.string(),
   description: z.string(),
+  status: z.enum(['AVAILABLE', 'LIMITED', 'SOLDOUT']),
 });
 
 export type CreateProductRequestDtoType = z.infer<typeof createProductRequestDto>;
