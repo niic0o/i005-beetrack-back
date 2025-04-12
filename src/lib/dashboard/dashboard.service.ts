@@ -1,6 +1,6 @@
 // lib/dashboard/dashboard.service.ts
 
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import {
   DashboardParams,
   DashboardData,
@@ -18,8 +18,6 @@ import {
   startOfLocalDay,
   endOfLocalDay,
 } from "./utils/date";
-
-const prisma = new PrismaClient();
 
 export const getDashboardData = async ({
   storeId,

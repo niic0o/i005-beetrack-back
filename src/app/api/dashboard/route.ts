@@ -14,6 +14,7 @@ import { NextResponse } from "next/server";
 import { getDashboardData } from "@/lib/dashboard/dashboard.service";
 import { dashboardQuerySchema } from "./dto";
 import { parseLocalDate } from "@/lib/dashboard/utils/date";
+import { getUserFromToken } from "@/lib/dashboard/getUserFromToken";
 
 /**
   Funcion que permite obtener reportes estadísticos del comercio
@@ -29,10 +30,15 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: parse.error.format() }, { status: 400 });
   }
 
-  const { storeId, view, date, fromDate, toDate } = parse.data;
+  const { view, date, fromDate, toDate } = parse.data;
+  const token = req.headers.get("cookie")?.split('; ').find(c => c.startsWith('token='))?.split('=')[1];
+  const user = await getUserFromToken(token);
 
-  console.log("Request dashboard", { storeId, view, date, fromDate, toDate }); //para debuggear
+  if (!user?.storeId) {
+    return NextResponse.json({ error: "Token inválido o faltante" }, { status: 401 });
+  }
 
+  const storeId = user.storeId;
   try {
     const result = await getDashboardData({
       storeId,
