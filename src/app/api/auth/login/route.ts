@@ -4,22 +4,9 @@ El usuario se loguea, generamos un token y se lo damos para que el navegador lo 
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { generateToken } from '../../user/utils';
-import { getUserByEmail } from '../../user/user.service';
-import { compareHash } from '../../user/utils';
-
-// Simulación de base de datos
-// const users = [
-//   { id: 1, email: "admin@admin.com", password: "1234", name: "pedro" },
-//   { id: 2, email: "user@user.com", password: "1234", name: "juan" },
-//   { id: 3, email: "nico@user.com", password: "nico", name: "nico" },
-// ];
-
-// // Simula búsqueda asincrónica de usuario
-// async function findUserByEmail(email: string) {
-//   await new Promise((resolve) => setTimeout(resolve, 100));
-//   return users.find((u) => u.email === email);
-// }
+import { generateToken } from '../../users/utils';
+import { getUserByEmail } from '../../users/user.service';
+import { compareHash } from '../../users/utils';
 
 // Valida que el body tenga los campos necesarios
 async function validateRequestBody(
