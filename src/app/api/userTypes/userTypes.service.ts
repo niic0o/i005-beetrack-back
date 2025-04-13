@@ -1,3 +1,11 @@
+import { UserRole } from '@prisma/client'; // Asegurate de importar los enums de Prisma
+
+export const isValidRole = (role: string): role is UserRole => {
+  return Object.values(UserRole).includes(role as UserRole);
+};
+// COMO LA TABLA userTypes se convirio en un enum no hace falta esta logica
+/*
+
 import { prisma } from '@/lib/prisma';
 
 export const getUserTypeByRole = async (role: string) => {
@@ -31,3 +39,4 @@ export const createUserType = async (role: string) => {
     throw new Error('Internal server error');
   }
 };
+*/

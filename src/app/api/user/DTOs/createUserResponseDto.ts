@@ -1,3 +1,4 @@
+/*
 import { z } from 'zod';
 import { createUserRequestDto } from './createUserRequestDto';
 
@@ -11,3 +12,4 @@ export const createUserResponseDto = createUserRequestDto
     createdAt: z.string(),
     updatedAt: z.string(),
   });
+*/
