@@ -2,11 +2,18 @@ import {
   deleteProduct,
   getProductById,
   updateProduct,
-} from '../product.service';
+} from '../../../../features/products/product.service';
 import { deleteFile, uploadFile } from '@/lib/cloudinary';
-import { isValidFile, removeFile, writeFile } from '../utils';
-import { handleError } from '@/lib/errorHandler';
-import { failResponse, successResponse } from '@/lib/responses';
+import {
+  isValidFile,
+  removeFile,
+  writeFile,
+} from '../../../../features/products/utils';
+import { handleError } from '@/lib/errors/errorHandler';
+import { successResponse } from '@/lib/responses';
+import { getTokenFromCookie } from '@/lib/getTokenFromCookie';
+import { UnauthorizedError } from '@/lib/errors/customErrors';
+import { getUserFromToken } from '@/lib/getUserFromToken';
 
 export async function PATCH(
   req: Request,
@@ -16,13 +23,22 @@ export async function PATCH(
     const productId = params.id;
     const productToUpdate = await getProductById(productId);
     if (!productToUpdate) {
-      return failResponse('El producto no existe');
+      throw new Error('El producto no existe');
     }
     const formData = await req.formData();
     const file = formData.get('file');
+    const token = getTokenFromCookie(req);
+
+    if (!token) {
+      throw new UnauthorizedError('Token inválido o faltante');
+    }
+    const user = await getUserFromToken(token);
+    if (!user) {
+      throw new Error('Usuario no encontrado');
+    }
     if (file) {
       if (!isValidFile(file)) {
-        return failResponse('Archivo no válido');
+        throw new Error('Archivo no válido');
       }
       await deleteFile(productToUpdate.cloudinary_id!);
       const filePath = await writeFile(file);
@@ -36,10 +52,11 @@ export async function PATCH(
       formData.append('imagePath', cloudinaryResult.secure_url);
       formData.append('cloudinary_id', cloudinaryResult.public_id);
     }
+    formData.append('storeId', user.storeId);
     const updatedProduct = await updateProduct(productToUpdate, formData);
     return successResponse(updatedProduct);
   } catch (error) {
-    handleError(error);
+    return handleError(error);
   }
 }
 
@@ -51,11 +68,11 @@ export async function DELETE(
     const productId = params.id;
     const deletedProduct = await deleteProduct(productId);
     if (!deletedProduct) {
-      return failResponse('Error al eliminar el producto');
+      throw new Error ('Error al eliminar el producto');
     }
     await deleteFile(deletedProduct.cloudinary_id!);
     return successResponse('Producto eliminado correctamente');
   } catch (error) {
-    handleError(error);
+    return handleError(error);
   }
 }

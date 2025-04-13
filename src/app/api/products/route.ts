@@ -1,22 +1,30 @@
-import { NextRequest } from 'next/server';
-import { writeFile, removeFile } from './utils';
+import { writeFile, removeFile } from '../../../features/products/utils';
 import { uploadFile } from '@/lib/cloudinary';
-import { createProduct, getAllProducts } from './product.service';
-import { failResponse, successResponse } from '@/lib/responses';
-import { handleError } from '@/lib/errorHandler';
-import { isValidFile } from './utils';
+import {
+  createProduct,
+  getAllProducts,
+} from '../../../features/products/product.service';
+import { successResponse } from '@/lib/responses';
+import { handleError } from '@/lib/errors/errorHandler';
+import { isValidFile } from '../../../features/products/utils';
+import { getTokenFromCookie } from '@/lib/getTokenFromCookie';
+import { UnauthorizedError } from '@/lib/errors/customErrors';
+import { getUserFromToken } from '@/lib/getUserFromToken';
 
-export async function GET(req: NextRequest) {
+export async function GET(req: Request) {
   try {
-    const { searchParams } = new URL(req.url);
-    const storeId = searchParams.get('storeId');
-    if (!storeId) {
-      return failResponse('storeId es requerido');
+    const token = getTokenFromCookie(req);
+    if (!token) {
+      throw new UnauthorizedError('Token inválido o faltante');
     }
-    const products = await getAllProducts(storeId);
+    const user = await getUserFromToken(token);
+    if (!user) {
+      throw new Error('Usuario no encontrado');
+    }
+    const products = await getAllProducts(user.storeId);
     return successResponse(products);
   } catch (error) {
-    handleError(error);
+    return handleError(error);
   }
 }
 
@@ -24,9 +32,18 @@ export async function POST(req: Request) {
   try {
     const formData = await req.formData();
     const file = formData.get('file');
+    const token = getTokenFromCookie(req);
+
+    if (!token) {
+      throw new UnauthorizedError('Token inválido o faltante');
+    }
+    const user = await getUserFromToken(token);
+    if (!user) {
+      throw new Error('Usuario no encontrado');
+    }
 
     if (!isValidFile(file)) {
-      return failResponse('Archivo no válido');
+      throw new Error('Archivo no válido');
     }
 
     const filePath = await writeFile(file);
@@ -39,11 +56,12 @@ export async function POST(req: Request) {
     formData.delete('file');
     formData.append('imagePath', cloudinaryResult.secure_url);
     formData.append('cloudinary_id', cloudinaryResult.public_id);
+    formData.append('storeId', user.storeId);
 
     const productCreated = await createProduct(formData);
 
     return successResponse(productCreated, 201);
   } catch (error) {
-    handleError(error);
+    return handleError(error);
   }
 }

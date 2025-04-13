@@ -1,56 +1,8 @@
-/*
-import { NextRequest, NextResponse } from 'next/server';
-import { createUser } from '../../user/user.service';
-import { generateToken } from '../../user/utils';
-
-export async function POST(req: NextRequest) {
-  try {
-    const userData = await req.json();
-
-    const newUser = await createUser(userData);
-
-    const token = generateToken(newUser.email);
-
-    const response = NextResponse.json(
-      { status: 'OK', message: 'Usuario creado exitosamente' },
-      { status: 201 }
-    );
-    response.cookies.set({
-      name: 'token',
-      value: token,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 60 * 60 * 24, // 1 día
-    });
-
-    return response;
-  } catch (error) {
-    if (error instanceof Error) {
-      return NextResponse.json(
-        {
-          message: error.message,
-        },
-        { status: 400 }
-      );
-    }
-    return NextResponse.json(
-      {
-        message: 'Internal server error',
-      },
-      { status: 500 }
-    );
-  }
-}
-*/
-
-// src/app/api/register/route.ts
-
-import { NextResponse } from 'next/server';
-import { registerUserAndStoreDto } from '../../user/DTOs/createUserRequestDto';
-import { registerUserAndStore } from '../../user/user.service';
-import { generateToken } from '../../user/utils';
+import { registerUserAndStoreDto } from '../../../../features/users/DTOs/createUserRequestDto';
+import { registerUserAndStore } from '../../../../features/users/user.service';
+import { generateToken } from '../../../../features/users/utils';
+import { successResponse } from '@/lib/responses';
+import { handleError } from '@/lib/errors/errorHandler';
 
 export async function POST(req: Request) {
   try {
@@ -59,33 +11,37 @@ export async function POST(req: Request) {
 
     // Lógica principal: crear usuario + tienda + userStore
     const createdUser = await registerUserAndStore(body);
+    if (!createdUser) {
+      throw new Error('Error al crear el usuario o la tienda');
+    }
+    // Agregué esta validación porque me saltaba un error de tipo al intentar acceder a los campos
+    if ('name' in createdUser && 'store' in createdUser) {
+      const token = generateToken(
+        createdUser.id,
+        createdUser.store.id,
+        createdUser.name
+      );
 
-    // Generar token
-    const token = generateToken( createdUser.id,
-      createdUser.store.id,
-      createdUser.name);
+      const response = successResponse(
+        'Usuario y tienda creados exitosamente',
+        201
+      );
 
-    const response = NextResponse.json(
-      {
-        status: 'OK',
-        message: 'Usuario y tienda creados exitosamente',
-      },
-      { status: 201 }
-    );
+      response.cookies.set({
+        name: 'token',
+        value: token,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 60 * 24, // 1 día
+      });
 
-    response.cookies.set({
-      name: 'token',
-      value: token,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 60 * 60 * 24, // 1 día
-    });
-
-    return response;
+      return response;
+    } else {
+      throw new Error('Tipo de respuesta inesperada');
+    }
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Error del servidor';
-    return NextResponse.json({ error: message }, { status: 400 });
+    return handleError(error);
   }
 }
