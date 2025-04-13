@@ -4,9 +4,10 @@ El usuario se loguea, generamos un token y se lo damos para que el navegador lo 
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { generateToken } from '../../users/utils';
-import { getUserByEmail } from '../../users/user.service';
-import { compareHash } from '../../users/utils';
+import { generateToken } from '../../user/utils';
+import { getUserByEmail } from '../../user/user.service';
+import { compareHash } from '../../user/utils';
+
 
 // Valida que el body tenga los campos necesarios
 async function validateRequestBody(
@@ -84,8 +85,14 @@ Manejo el error si los hubiera
 export async function POST(req: NextRequest) {
   try {
     const { email, password } = await validateRequestBody(req);
-    await authenticateUser(email, password);
-    const token = generateToken(email);
+    const user = await authenticateUser(email, password);
+    // Funciona solo si tiene una tienda asociada. Considerar en el futuro esto.
+    const store = user.userStores[0]?.store;
+    if (!store) {
+      throw new Error('El usuario no tiene tiendas asociadas');
+    }
+    
+    const token = generateToken(user.id, store.id, user.name);
     return sendAuthResponse(token);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Error desconocido';

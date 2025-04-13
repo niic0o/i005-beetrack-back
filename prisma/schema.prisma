@@ -19,9 +19,9 @@ enum Status {
 }
 
 enum PaymentMethod {
-CARD
-DIGITAL
-CASH
+  CARD
+  DIGITAL
+  CASH
 }
 
 enum OrderStatus {
@@ -36,40 +36,48 @@ enum ProductStatus {
   SOLDOUT
 }
 
-model UserType {
-  id String @id @default(cuid())
-  role       String
-
-  Users User[]
+enum UserRole {
+  ADMIN // Acceso total: sistema y tiendas
+  SELLER // Vendedor o cajero de tienda
+  STOCKER // Repositor de productos
+  ACCOUNTANT // Solo accede a reportes y finanzas
 }
 
 model User {
-  id         String   @id @default(uuid())
-  userTypeID String
-  userType   UserType @relation(fields: [userTypeID], references: [id])
-  name       String
-  last_name  String
-  birthdate  DateTime
-  email      String   @unique
-  password   String
-  status     Status   @default(ACTIVE)
+  id        String   @id @default(uuid())
+  userRole  UserRole @default(ADMIN)
+  name      String
+  last_name String
+  birthdate DateTime
+  email     String   @unique
+  password  String
+  status    Status   @default(ACTIVE)
 
-  stores Store[]
+  userStores UserStore[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Store {
+model UserStore {
   id      String @id @default(uuid())
+  userId  String
+  storeId String
+
+  user  User  @relation(fields: [userId], references: [id])
+  store Store @relation(fields: [storeId], references: [id])
+
+  @@unique([userId, storeId])
+}
+
+model Store {
+  id      String  @id @default(uuid())
   name    String
   address String
   tel     String?
-  status  Status @default(ACTIVE)
+  status  Status  @default(ACTIVE)
 
-  userID String
-  user   User   @relation(fields: [userID], references: [id])
-
+  userStores  UserStore[]
   products    Product[]
   orders      Order[]
   dailyReport DailyReport[]
@@ -110,6 +118,7 @@ model Order {
   paymentId      String?
   payment        Payment?    @relation(fields: [paymentId], references: [id])
   pdfPath        String?
+  cloudinary_id  String?
   status         OrderStatus @default(PENDING)
 
   orderItems OrderLines[]
@@ -130,7 +139,7 @@ model Discount {
 }
 
 model Payment {
-  id   String @id @default(uuid())
+  id   String        @id @default(uuid())
   name PaymentMethod @default(CASH)
 
   orders Order[]
@@ -151,8 +160,8 @@ model OrderLines {
 
 model DailyReport {
   id                  String  @id @default(uuid())
-  totalOrders         Int @default(0)
-  totalProductsSold   Int @default(0)
+  totalOrders         Int     @default(0)
+  totalProductsSold   Int     @default(0)
   totalSales          Decimal @default(0.0) @db.Decimal(13, 2)
   totalCost           Decimal @default(0.0) @db.Decimal(13, 2)
   totalCashSales      Decimal @default(0.0) @db.Decimal(13, 2)
