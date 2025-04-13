@@ -67,27 +67,19 @@ import { createHash } from './utils';
 import { toCreateUserResponseDto } from './Mappers/toCreateUserResponseDto';
 */
 
-// esta funcion hay que reveer para el login
-export const getUserByEmail = async (email: string) => {
-  try {
-    const userFound = await prisma.user.findUnique({
-      where: { email },
-      include: {
-        userStores: {
-          include: {
-            store: true, // Trae también los datos de cada tienda
-          },
+// esta funcion es para el login
+export async function getUserByEmail(email: string) {
+  return prisma.user.findUnique({
+    where: { email },
+    include: {
+      userStores: {
+        include: {
+          store: true,
         },
       },
-    });
-    return userFound;
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(error.message);
-    }
-    throw new Error('Error interno del servidor');
-  }
-};
+    },
+  });
+}
 
 
 export const registerUserAndStore = async (data: {
@@ -156,7 +148,7 @@ export const registerUserAndStore = async (data: {
           id: newStore.id,
         },
       };
-      
+
     });
 
     return result;
