@@ -63,7 +63,9 @@ export const createUser = async (user: CreateUserRequestDtoType) => {
 */
 import { prisma } from '@/lib/prisma';
 import { createHash } from './utils';
+/*
 import { toCreateUserResponseDto } from './Mappers/toCreateUserResponseDto';
+*/
 
 // esta funcion hay que reveer para el login
 export const getUserByEmail = async (email: string) => {
@@ -146,7 +148,15 @@ export const registerUserAndStore = async (data: {
         },
       });
 
-      return toCreateUserResponseDto(newUser);
+      return {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        store: {
+          id: newStore.id,
+        },
+      };
+      
     });
 
     return result;

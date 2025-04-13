@@ -1,3 +1,4 @@
+/*
 import { User } from '@prisma/client';
 import { createUserResponseDto } from '../DTOs/createUserResponseDto';
 
@@ -12,3 +13,4 @@ export const toCreateUserResponseDto = (user: User) => {
     updatedAt: user.updatedAt.toISOString(),
   });
 };
+*/
