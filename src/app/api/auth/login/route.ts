@@ -8,18 +8,6 @@ import { generateToken } from '../../user/utils';
 import { getUserByEmail } from '../../user/user.service';
 import { compareHash } from '../../user/utils';
 
-// Simulación de base de datos
-// const users = [
-//   { id: 1, email: "admin@admin.com", password: "1234", name: "pedro" },
-//   { id: 2, email: "user@user.com", password: "1234", name: "juan" },
-//   { id: 3, email: "nico@user.com", password: "nico", name: "nico" },
-// ];
-
-// // Simula búsqueda asincrónica de usuario
-// async function findUserByEmail(email: string) {
-//   await new Promise((resolve) => setTimeout(resolve, 100));
-//   return users.find((u) => u.email === email);
-// }
 
 // Valida que el body tenga los campos necesarios
 async function validateRequestBody(
@@ -97,8 +85,14 @@ Manejo el error si los hubiera
 export async function POST(req: NextRequest) {
   try {
     const { email, password } = await validateRequestBody(req);
-    await authenticateUser(email, password);
-    const token = generateToken(email);
+    const user = await authenticateUser(email, password);
+    // Funciona solo si tiene una tienda asociada. Considerar en el futuro esto.
+    const store = user.userStores[0]?.store;
+    if (!store) {
+      throw new Error('El usuario no tiene tiendas asociadas');
+    }
+    
+    const token = generateToken(user.id, store.id, user.name);
     return sendAuthResponse(token);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Error desconocido';
