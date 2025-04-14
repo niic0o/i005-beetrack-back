@@ -4,6 +4,12 @@ import { getUserProfile } from "@/features/users/user.service";
 
 const secret_key = new TextEncoder().encode(process.env.SECRET_KEY);
 
+/**
+ * A diferencia de la funcion myData que devuelve solo los id, esta funcion devuelve
+ * todos los datos del usuario.
+ * @param request solo es necesario haber iniciado sesion
+ * @returns devuelve los datos del usuario que inicio sesion con todas sus tiendas asociadas
+ */
 export async function GET(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
 
