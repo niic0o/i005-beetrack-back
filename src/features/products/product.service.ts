@@ -10,7 +10,8 @@ export const createProduct = async (formData: FormData): Promise<Product> => {
   
   const productStatus = setProductStatus(
     Number(obj.stock),
-    Number(obj.stock_min)
+    Number(obj.stock_min),
+    Number(obj.stock_optimus)
   );
   obj.status = productStatus;
   const productData = createProductRequestDto.parse(obj);
@@ -40,7 +41,8 @@ export const updateProduct = async (
   if (objData.stock) {
     objData.status = setProductStatus(
       Number(objData.stock),
-      Number(product.stock_min)
+      Number(product.stock_min),
+      Number(product.stock_optimus)
     );
   }
   const parsedData = updateProductRequestDto.parse(objData);

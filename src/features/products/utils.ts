@@ -2,6 +2,7 @@ import fs from 'fs';
 import { pipeline } from 'stream/promises';
 import { Readable } from 'stream';
 import path from 'path';
+import { ProductStatus } from '@prisma/client';
 
 const hasValidMimeType = (file: File): Boolean => {
   const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
@@ -48,13 +49,19 @@ export const removeFile = (filePath: string) => {
   });
 };
 
-export const setProductStatus = (stock: number, stock_min: number): string => {
+export const setProductStatus = (
+  stock: number,
+  stock_min: number,
+  stock_optimus: number
+): string => {
   if (stock === 0) {
-    return 'SOLDOUT';
+    return ProductStatus.SOLDOUT;
   } else if (stock < stock_min) {
-    return 'LIMITED';
+    return ProductStatus.LIMITED;
+  } else if (stock < stock_optimus) {
+    return ProductStatus.AVAILABLE;
   } else {
-    return 'AVAILABLE';
+    return ProductStatus.OPTIMUM;
   }
 };
 
