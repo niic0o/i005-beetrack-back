@@ -67,6 +67,17 @@ export const getProductById = async (
   return product;
 };
 
+export const getProductByBarcode = async (
+  barcode: string
+): Promise<Product | null> => {
+  const product = await prisma.product.findUnique({
+    where: {
+      barcode,
+    },
+  });
+  return product;
+};
+
 export const deleteProduct = async (productId: string): Promise<Product> => {
   const deletedProduct = await prisma.product.delete({
     where: {

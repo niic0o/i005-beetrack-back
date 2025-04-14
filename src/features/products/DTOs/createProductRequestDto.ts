@@ -3,6 +3,7 @@ import { ProductStatus } from '@prisma/client';
 import { zodEnumFromPrisma } from '@/lib/zodEnumFromPrisma';
 
 export const createProductRequestDto = z.object({
+  barcode: z.string().nonempty(),
   name: z.string().nonempty(),
   storeId: z.string().nonempty(),
   salesPrice: z.coerce.number().positive(),
