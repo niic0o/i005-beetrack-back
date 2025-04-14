@@ -133,3 +133,8 @@ export const getUserProfile = async (userId: string, storeId: string): Promise<U
 
   return profileResponse;
 };
+
+/* Funcion delete user
+Debe setear el status del user como blocked.
+Luego destruir el token
+*/
