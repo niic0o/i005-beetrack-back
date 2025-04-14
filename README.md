@@ -27,7 +27,11 @@ npm run dev
 |--------|-------------------|--------------------------------------|---------------------------------------------------|----------------------------------------------|
 | POST   | `/api/auth/register` | Registra un nuevo usuario            | Ver ejemplo abajo    | `201 OK` Usuario creado<br>`400` Error de validación<br>`500` Error interno |
 | POST   | `/api/auth/login`    | Crea la cookie con el token           | `{ "email": string, "password": string }`         | `200 OK` Login exitoso<br>`400/401` Error credenciales<br>`500` Error interno |
-| POST   | `/api/auth/logout`   | Destruye la cookie        | _Sin body_                                        | `202 OK` Logout exitoso<br>`500` Error interno |
+| POST   | `/api/auth/logout`   | Destruye la cookie        | _Sin body_                                        | `202 OK` Logout exitoso<br>`500` Error interno | 
+| GET  | `/api/products`  | Devuelve todos los productos | _Sin body_ | `200 OK` Lista de productos<br>`500` Error interno |
+| POST |  `/api/products` | Crea un nuevo producto | formData (ver campos requeridos abajo) | `201 OK` Producto creado<br>`400` Error de validación<br>`500` Error interno |
+| PATCH |  `/api/products/:id` | Actualiza un producto | formData (1 o más campos del ejemplo de crear producto) | `200 OK` Producto actualizado<br>`400` Error de validación<br>`500` Error interno |
+| DELETE |  `/api/products/:id` | Elimina un  producto | _Sin body_ | `200 OK` Producto eliminado<br>`500` Error interno |
 
 ## Ejemplo de Body para /api/auth/register
 ```json
@@ -36,9 +40,28 @@ npm run dev
     "last_name": "Pérez",
     "email": "example@email.com",
     "birthdate": "1985-05-02",
-    "password": "1234"
+    "password": "1234",
+    "storeName": "Super Juan",
+    "storeAddress": "Calle Siempre Viva 123",
+    "storeTel": "12345678"
 }
 ```
+
+## Campos requeridos en el formData para /api/products
+```
+
+  name: string,
+  salesPrice: string,
+  costPrice: string,
+  stock: string,
+  stock_optimus: string,
+  stock_min: string,
+  file: File,(*)
+  description: string (opcional)
+
+```
+
+(*) La imágen del producto debe ser de hasta 2MB y estar en formato jpg/jpeg/png/webp
 
 ## Autenticación
 
@@ -51,4 +74,5 @@ npm run dev
 
 ## Notas
 
-- Como todavía no se van a implementar roles desde el frontend, los usuarios se crean con un rol "admin" por defecto.
+- Como todavía no se van a implementar roles desde el frontend, los usuarios se crean con un rol "ADMIN" por defecto.
+

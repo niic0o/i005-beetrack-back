@@ -11,10 +11,10 @@ dashboard.dto.ts: define y valida inputs esperados desde el frontend (view, fech
 // app/api/dashboard/route.ts
 
 import { NextResponse } from "next/server";
-import { getDashboardData } from "@/lib/dashboard/dashboard.service";
+import { getDashboardData } from "@/features/dashboard/dashboard.service";
 import { dashboardQuerySchema } from "./dto";
-import { parseLocalDate } from "@/lib/dashboard/utils/date";
-import { getUserFromToken } from "@/lib/dashboard/getUserFromToken";
+import { parseLocalDate } from "@/features/dashboard/utils/date";
+import { getUserFromToken } from "@/lib/getUserFromToken";
 
 /**
   Funcion que permite obtener reportes estadísticos del comercio

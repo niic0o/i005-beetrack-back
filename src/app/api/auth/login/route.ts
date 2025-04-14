@@ -1,13 +1,13 @@
 /*
 El usuario se loguea, generamos un token y se lo damos para que el navegador lo guarde en una cookie
 */
-
-import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { generateToken } from '../../user/utils';
-import { getUserByEmail } from '../../user/user.service';
-import { compareHash } from '../../user/utils';
-
+import { generateToken } from '../../../../features/users/utils';
+import { getUserByEmail } from '../../../../features/users/user.service';
+import { compareHash } from '../../../../features/users/utils';
+import { successResponse } from '@/lib/responses';
+import { UnauthorizedError } from '@/lib/errors/customErrors';
+import { handleError } from '@/lib/errors/errorHandler';
 
 // Valida que el body tenga los campos necesarios
 async function validateRequestBody(
@@ -18,17 +18,13 @@ async function validateRequestBody(
   try {
     body = await req.json();
   } catch {
-    const err = new Error('Formato de JSON inválido');
-    (err as any).statusCode = 400;
-    throw err;
+    throw new Error('Formato de JSON inválido');
   }
 
   const { email, password } = body;
 
   if (!email || !password) {
-    const err = new Error('Email y contraseña son requeridos');
-    (err as any).statusCode = 400;
-    throw err;
+    throw new Error('Email y contraseña son requeridos');
   }
 
   return { email, password };
@@ -39,15 +35,11 @@ async function authenticateUser(email: string, password: string) {
   const user = await getUserByEmail(email);
 
   if (!user) {
-    const err = new Error('Datos incorrectos');
-    (err as any).statusCode = 401;
-    throw err;
+    throw new UnauthorizedError('Datos incorrectos');
   }
   const isValidPassword = await compareHash(user, password);
   if (!isValidPassword) {
-    const err = new Error('Contraseña incorrecta');
-    (err as any).statusCode = 401;
-    throw err;
+    throw new UnauthorizedError('Contraseña incorrecta');
   }
 
   return user;
@@ -55,14 +47,7 @@ async function authenticateUser(email: string, password: string) {
 
 // Responde con cookie y token
 function sendAuthResponse(token: string) {
-  const response = NextResponse.json(
-    {
-      status: 'OK',
-      // token,
-      message: 'Usuario autenticado correctamente',
-    },
-    { status: 200 }
-  );
+  const response = successResponse('Usuario autenticado correctamente', 200);
 
   response.cookies.set('token', token, {
     httpOnly: true,
@@ -91,22 +76,10 @@ export async function POST(req: NextRequest) {
     if (!store) {
       throw new Error('El usuario no tiene tiendas asociadas');
     }
-    
+
     const token = generateToken(user.id, store.id, user.name);
     return sendAuthResponse(token);
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Error desconocido';
-    const status =
-      err instanceof Error && (err as any).statusCode
-        ? (err as any).statusCode
-        : 500;
-
-    return NextResponse.json(
-      {
-        status: 'ERROR',
-        message,
-      },
-      { status }
-    );
+    return handleError(err, 'Error al iniciar sesión');
   }
 }
