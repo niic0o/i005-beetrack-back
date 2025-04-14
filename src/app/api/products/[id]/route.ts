@@ -12,7 +12,7 @@ import {
 import { handleError } from '@/lib/errors/errorHandler';
 import { successResponse } from '@/lib/responses';
 import { getTokenFromCookie } from '@/lib/getTokenFromCookie';
-import { UnauthorizedError } from '@/lib/errors/customErrors';
+import { ResourceNotFound, UnauthorizedError, ValidationError } from '@/lib/errors/customErrors';
 import { getUserFromToken } from '@/lib/getUserFromToken';
 
 export async function PATCH(
@@ -23,7 +23,7 @@ export async function PATCH(
     const productId = params.id;
     const productToUpdate = await getProductById(productId);
     if (!productToUpdate) {
-      throw new Error('El producto no existe');
+      throw new ResourceNotFound('El producto no existe');
     }
     const formData = await req.formData();
     const file = formData.get('file');
@@ -34,11 +34,11 @@ export async function PATCH(
     }
     const user = await getUserFromToken(token);
     if (!user) {
-      throw new Error('Usuario no encontrado');
+      throw new ResourceNotFound('Usuario no encontrado');
     }
     if (file) {
       if (!isValidFile(file)) {
-        throw new Error('Archivo no válido');
+        throw new ValidationError('Archivo no válido');
       }
       await deleteFile(productToUpdate.cloudinary_id!);
       const filePath = await writeFile(file);
@@ -68,10 +68,29 @@ export async function DELETE(
     const productId = params.id;
     const deletedProduct = await deleteProduct(productId);
     if (!deletedProduct) {
-      throw new Error ('Error al eliminar el producto');
+      throw new Error('Error al eliminar el producto');
     }
     await deleteFile(deletedProduct.cloudinary_id!);
     return successResponse('Producto eliminado correctamente');
+  } catch (error) {
+    return handleError(error);
+  }
+}
+
+export async function GET(
+  _req: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const productId = params.id;
+    const requiredProduct = await getProductById(productId);
+    if (!requiredProduct) {
+      throw new ResourceNotFound(
+        'El producto requerido no existe en la base de datos'
+      );
+    }
+
+    return successResponse(requiredProduct);
   } catch (error) {
     return handleError(error);
   }

@@ -11,3 +11,20 @@ export class ForbiddenError extends Error {
     this.name = 'ForbiddenError';
   }
 }
+
+export class ResourceNotFound extends Error {
+  status: number;
+
+  constructor(message = 'Resource not found') {
+    super(message);
+    this.name = 'ResourceNotFound';
+    this.status = 404;
+  }
+}
+
+export class ValidationError extends Error {
+  constructor(message = 'Validation Error') {
+    super(message);
+    this.name = 'ValidationError';
+  }
+}

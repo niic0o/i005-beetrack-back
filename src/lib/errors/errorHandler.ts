@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 import { ZodError } from 'zod';
-import { ForbiddenError, UnauthorizedError } from './customErrors';
+import {
+  ForbiddenError,
+  ResourceNotFound,
+  UnauthorizedError,
+  ValidationError,
+} from './customErrors';
 import { Prisma } from '@prisma/client';
 
 export function handleError(error: unknown, message?: string) {
@@ -76,6 +81,21 @@ export function handleError(error: unknown, message?: string) {
     return NextResponse.json(
       { status: 'fail', message: error.message },
       { status: 403 }
+    );
+  }
+  //No encuentra recurso por id
+  if (error instanceof ResourceNotFound) {
+    return NextResponse.json(
+      { status: 'fail', message: error.message },
+      { status: 404 }
+    );
+  }
+  //Otros errores de validación
+  //No encuentra recurso por id
+  if (error instanceof ValidationError) {
+    return NextResponse.json(
+      { status: 'fail', message: error.message },
+      { status: 404 }
     );
   }
   //Otros errores
