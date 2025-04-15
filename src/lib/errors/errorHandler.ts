@@ -95,7 +95,7 @@ export function handleError(error: unknown, message?: string) {
   if (error instanceof ValidationError) {
     return NextResponse.json(
       { status: 'fail', message: error.message },
-      { status: 404 }
+      { status: 400 }
     );
   }
   //Otros errores

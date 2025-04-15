@@ -11,11 +11,12 @@ export async function POST(req: Request) {
 
     // Lógica principal: crear usuario + tienda + userStore
     const createdUser = await registerUserAndStore(body);
+    console.log("createdUser", createdUser);
+    
     if (!createdUser) {
       throw new Error('Error al crear el usuario o la tienda');
     }
-    // Agregué esta validación porque me saltaba un error de tipo al intentar acceder a los campos
-    if ('name' in createdUser && 'store' in createdUser) {
+
       const token = generateToken(
         createdUser.id,
         createdUser.store.id,
@@ -38,9 +39,6 @@ export async function POST(req: Request) {
       });
 
       return response;
-    } else {
-      throw new Error('Tipo de respuesta inesperada');
-    }
   } catch (error) {
     return handleError(error);
   }

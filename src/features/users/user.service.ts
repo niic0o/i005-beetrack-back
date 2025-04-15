@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { createHash } from './utils';
-import { handleError } from '@/lib/errors/errorHandler';
 import { UserData } from "./user.dto";
+import { ValidationError } from '@/lib/errors/customErrors';
 
 // esta funcion es para el login
 export async function getUserByEmail(email: string) {
@@ -42,7 +42,7 @@ export const registerUserAndStore = async (data: {
     const result = await prisma.$transaction(async (tx) => {
       // 1. Chequear si ya existe el usuario
       const existingUser = await tx.user.findUnique({ where: { email } });
-      if (existingUser) throw new Error('El usuario ya existe');
+      if (existingUser) throw new ValidationError('El usuario ya existe');
 
       // 2. Crear el usuario
       const hashedPassword = await createHash(password);
@@ -87,7 +87,7 @@ export const registerUserAndStore = async (data: {
 
     return result;
   } catch (error) {
-    return handleError(error, 'Error al registrar el usuario y la tienda');
+    throw error;
   }
 };
 
