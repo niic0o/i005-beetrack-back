@@ -3,8 +3,14 @@ import { corsMiddleware } from '@/middleware/cors';
 import { authMiddleware } from '@/middleware/auth';
 
 export function middleware(req: NextRequest) {
-  const corsResponse = corsMiddleware(req);
-  if (corsResponse) return corsResponse;
+  const res = NextResponse.next();
+  corsMiddleware(req, res);
+  if (req.method === 'OPTIONS') {
+    return new NextResponse(null, {
+      status: 204,
+      headers: res.headers,
+    });
+  }
 
   //autenticación para todas las rutas excepto login y register
   const excludedPaths = ['/api/auth/login', '/api/auth/register'];
