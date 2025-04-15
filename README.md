@@ -51,6 +51,7 @@ npm run dev
 ```
 
   name: string,
+  barcode: string,
   salesPrice: string,
   costPrice: string,
   stock: string,
