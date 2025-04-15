@@ -47,6 +47,7 @@ model Store {
 
 model Product {
   id            String        @id @default(uuid())
+  barcode       String        @unique
   name          String
   stock         Int
   description   String?

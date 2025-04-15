@@ -8,7 +8,7 @@ import { successResponse } from '@/lib/responses';
 import { handleError } from '@/lib/errors/errorHandler';
 import { isValidFile } from '../../../features/products/utils';
 import { getTokenFromCookie } from '@/lib/getTokenFromCookie';
-import { UnauthorizedError } from '@/lib/errors/customErrors';
+import { ResourceNotFound, UnauthorizedError, ValidationError } from '@/lib/errors/customErrors';
 import { getUserFromToken } from '@/lib/getUserFromToken';
 
 export async function GET(req: Request) {
@@ -19,7 +19,7 @@ export async function GET(req: Request) {
     }
     const user = await getUserFromToken(token);
     if (!user) {
-      throw new Error('Usuario no encontrado');
+      throw new ResourceNotFound('Usuario no encontrado');
     }
     const products = await getAllProducts(user.storeId);
     return successResponse(products);
@@ -39,11 +39,11 @@ export async function POST(req: Request) {
     }
     const user = await getUserFromToken(token);
     if (!user) {
-      throw new Error('Usuario no encontrado');
+      throw new ResourceNotFound('Usuario no encontrado');
     }
 
     if (!isValidFile(file)) {
-      throw new Error('Archivo no válido');
+      throw new ValidationError('Archivo no válido');
     }
 
     const filePath = await writeFile(file);

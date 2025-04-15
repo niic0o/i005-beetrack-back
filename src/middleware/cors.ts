@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 //Agregar la url del frontend cuando esté en producción
 const allowedOrigins = ['http://localhost:3000'];
 
-export async function corsMiddleware(req: NextRequest) {
+export function corsMiddleware(req: NextRequest) {
   const origin = req.headers.get('origin') || '';
   const isAllowed = allowedOrigins.includes(origin);
 
@@ -13,7 +13,7 @@ export async function corsMiddleware(req: NextRequest) {
     res.headers.set('Access-Control-Allow-Origin', origin);
     res.headers.set(
       'Access-Control-Allow-Methods',
-      'GET,POST,PUT,DELETE,OPTIONS'
+      'GET,POST,PUT,PATCH,DELETE,OPTIONS'
     );
     res.headers.set(
       'Access-Control-Allow-Headers',
@@ -29,5 +29,5 @@ export async function corsMiddleware(req: NextRequest) {
     });
   }
 
-  return null;
+  return res;
 }
