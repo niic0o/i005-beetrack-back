@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { createHash } from './utils';
 import { handleError } from '@/lib/errors/errorHandler';
+import { UserData } from "./user.dto";
 
 // esta funcion es para el login
 export async function getUserByEmail(email: string) {
@@ -89,3 +90,51 @@ export const registerUserAndStore = async (data: {
     return handleError(error, 'Error al registrar el usuario y la tienda');
   }
 };
+
+/**
+ * Obtiene el perfil del usuario y los datos de su tienda.
+ * 
+ * @param userId - ID del usuario a obtener
+ * @param storeId - ID de la tienda a asociar
+ * @returns Los datos del usuario junto con los datos de la tienda
+ */
+export const getUserProfile = async (userId: string, storeId: string): Promise<UserData | null> => {
+  const profile = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!profile) {
+    return null;
+  }
+
+  const store = await prisma.store.findUnique({
+    where: { id: storeId },
+  });
+
+  const profileResponse: UserData = {
+    id: profile.id,
+    name: profile.name,
+    last_name: profile.last_name,
+    birthdate: profile.birthdate,
+    email: profile.email,
+    status: profile.status,
+    createdAt: profile.createdAt,
+    updatedAt: profile.updatedAt,
+    store: store ? {
+      id: store.id,
+      name: store.name,
+      tel: store.tel,
+      address: store.address,
+      createdAt: store.createdAt,
+      updatedAt: store.updatedAt,
+      status: store.status,
+    } : null, // Manejo de null para si no existe la tienda
+  };
+
+  return profileResponse;
+};
+
+/* Funcion delete user
+Debe setear el status del user como blocked.
+Luego destruir el token
+*/

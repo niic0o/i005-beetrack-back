@@ -30,13 +30,17 @@ async function validateRequestBody(
   return { email, password };
 }
 
-// Verifica usuario y contraseña
 async function authenticateUser(email: string, password: string) {
   const user = await getUserByEmail(email);
 
   if (!user) {
     throw new UnauthorizedError('Datos incorrectos');
   }
+
+  if (user.status === "BLOCKED") {
+    throw new UnauthorizedError('Tu cuenta ha sido bloqueada');
+  }
+
   const isValidPassword = await compareHash(user, password);
   if (!isValidPassword) {
     throw new UnauthorizedError('Contraseña incorrecta');
