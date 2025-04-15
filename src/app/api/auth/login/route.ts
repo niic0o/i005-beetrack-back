@@ -55,11 +55,12 @@ function sendAuthResponse(token: string) {
 
   response.cookies.set('token', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    secure: true, // siempre true, aunque estés en localhost
+    sameSite: 'none', // este es clave para que funcione en cross-origin
     maxAge: 60 * 60 * 24,
     path: '/',
   });
+
 
   return response;
 }
