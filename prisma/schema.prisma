@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,6 +5,127 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String      @id @default(uuid())
+  name       String
+  last_name  String
+  email      String      @unique
+  password   String
+  status     Status      @default(ACTIVE)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  birthdate  DateTime
+  userRole   UserRole    @default(ADMIN)
+  userStores UserStore[]
+}
+
+model UserStore {
+  id      String @id @default(uuid())
+  userId  String
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id])
+  user    User   @relation(fields: [userId], references: [id])
+
+  @@unique([userId, storeId])
+}
+
+model Store {
+  id          String        @id @default(uuid())
+  name        String
+  address     String
+  status      Status        @default(ACTIVE)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  tel         String?
+  dailyReport DailyReport[]
+  orders      Order[]
+  products    Product[]
+  userStores  UserStore[]
+}
+
+model Product {
+  id            String        @id @default(uuid())
+  barcode       String        @unique
+  name          String
+  stock         Int
+  description   String?
+  storeId       String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  costPrice     Decimal       @db.Decimal(9, 2)
+  imagePath     String?
+  salesPrice    Decimal       @db.Decimal(9, 2)
+  status        ProductStatus @default(LIMITED)
+  stock_min     Int
+  stock_optimus Int
+  cloudinary_id String?
+  orderItems    OrderLines[]
+  store         Store         @relation(fields: [storeId], references: [id])
+}
+
+model Order {
+  id             String       @id @default(uuid())
+  totalAmount    Decimal      @db.Decimal(10, 2)
+  status         OrderStatus  @default(PENDING)
+  storeId        String
+  paymentId      String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  discountID     String?
+  pdfPath        String?
+  subTotalAmount Decimal      @db.Decimal(10, 2)
+  cloudinary_id  String?
+  discount       Discount?    @relation(fields: [discountID], references: [id])
+  payment        Payment?     @relation(fields: [paymentId], references: [id])
+  store          Store        @relation(fields: [storeId], references: [id])
+  orderItems     OrderLines[]
+}
+
+model Discount {
+  id          String   @id @default(uuid())
+  description String
+  rate        Decimal  @db.Decimal(5, 2)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  orders      Order[]
+}
+
+model Payment {
+  id     String        @id @default(uuid())
+  name   PaymentMethod @default(CASH)
+  orders Order[]
+}
+
+model OrderLines {
+  id              String  @id @default(uuid())
+  orderId         String
+  productId       String
+  quantity        Int
+  totalSalesPrice Decimal @db.Decimal(9, 2)
+  order           Order   @relation(fields: [orderId], references: [id])
+  product         Product @relation(fields: [productId], references: [id])
+
+  @@unique([orderId, productId])
+}
+
+model DailyReport {
+  id                  String   @id @default(uuid())
+  totalOrders         Int      @default(0)
+  totalProductsSold   Int      @default(0)
+  totalSales          Decimal  @default(0.0) @db.Decimal(13, 2)
+  totalCost           Decimal  @default(0.0) @db.Decimal(13, 2)
+  totalCashSales      Decimal  @default(0.0) @db.Decimal(13, 2)
+  totalCardSales      Decimal  @default(0.0) @db.Decimal(13, 2)
+  totalDigitalSales   Decimal  @default(0.0) @db.Decimal(13, 2)
+  totalProfit         Decimal  @db.Decimal(13, 2)
+  bestSellingProduct  String?
+  leastSellingProduct String?
+  storeId             String
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  store               Store    @relation(fields: [storeId], references: [id])
 }
 
 enum Status {
@@ -31,151 +146,15 @@ enum OrderStatus {
 }
 
 enum ProductStatus {
-  OPTIMUM
   AVAILABLE
   LIMITED
   SOLDOUT
+  OPTIMUM
 }
 
 enum UserRole {
-  ADMIN // Acceso total: sistema y tiendas
-  SELLER // Vendedor o cajero de tienda
-  STOCKER // Repositor de productos
-  ACCOUNTANT // Solo accede a reportes y finanzas
-}
-
-model User {
-  id        String   @id @default(uuid())
-  userRole  UserRole @default(ADMIN)
-  name      String
-  last_name String
-  birthdate DateTime
-  email     String   @unique
-  password  String
-  status    Status   @default(ACTIVE)
-
-  userStores UserStore[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model UserStore {
-  id      String @id @default(uuid())
-  userId  String
-  storeId String
-
-  user  User  @relation(fields: [userId], references: [id])
-  store Store @relation(fields: [storeId], references: [id])
-
-  @@unique([userId, storeId])
-}
-
-model Store {
-  id      String  @id @default(uuid())
-  name    String
-  address String
-  tel     String?
-  status  Status  @default(ACTIVE)
-
-  userStores  UserStore[]
-  products    Product[]
-  orders      Order[]
-  dailyReport DailyReport[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Product {
-  id            String        @id @default(uuid())
-  barcode       String        @unique
-  storeId       String
-  store         Store         @relation(fields: [storeId], references: [id])
-  name          String
-  salesPrice    Decimal       @db.Decimal(9, 2)
-  costPrice     Decimal       @db.Decimal(9, 2)
-  stock         Int
-  stock_optimus Int
-  stock_min     Int
-  imagePath     String?
-  cloudinary_id String?
-  description   String?
-  status        ProductStatus @default(LIMITED)
-
-  orderItems OrderLines[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Order {
-  id             String      @id @default(uuid())
-  storeId        String
-  store          Store       @relation(fields: [storeId], references: [id])
-  subTotalAmount Decimal     @db.Decimal(10, 2)
-  discountID     String?
-  discount       Discount?   @relation(fields: [discountID], references: [id])
-  totalAmount    Decimal     @db.Decimal(10, 2)
-  paymentId      String?
-  payment        Payment?    @relation(fields: [paymentId], references: [id])
-  pdfPath        String?
-  cloudinary_id  String?
-  status         OrderStatus @default(PENDING)
-
-  orderItems OrderLines[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Discount {
-  id          String  @id @default(uuid())
-  description String
-  rate        Decimal @db.Decimal(5, 2)
-
-  orders Order[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Payment {
-  id   String        @id @default(uuid())
-  name PaymentMethod @default(CASH)
-
-  orders Order[]
-}
-
-model OrderLines {
-  id              String  @id @default(uuid())
-  orderId         String
-  productId       String
-  quantity        Int
-  totalSalesPrice Decimal @db.Decimal(9, 2)
-
-  order   Order   @relation(fields: [orderId], references: [id])
-  product Product @relation(fields: [productId], references: [id])
-
-  @@unique([orderId, productId])
-}
-
-model DailyReport {
-  id                  String  @id @default(uuid())
-  totalOrders         Int     @default(0)
-  totalProductsSold   Int     @default(0)
-  totalSales          Decimal @default(0.0) @db.Decimal(13, 2)
-  totalCost           Decimal @default(0.0) @db.Decimal(13, 2)
-  totalCashSales      Decimal @default(0.0) @db.Decimal(13, 2)
-  totalCardSales      Decimal @default(0.0) @db.Decimal(13, 2)
-  totalDigitalSales   Decimal @default(0.0) @db.Decimal(13, 2)
-  totalProfit         Decimal @db.Decimal(13, 2)
-  bestSellingProduct  String?
-  leastSellingProduct String?
-
-  storeId String
-  store   Store  @relation(fields: [storeId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  ADMIN
+  SELLER
+  STOCKER
+  ACCOUNTANT
 }
