@@ -1,15 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { corsMiddleware } from '@/middleware/cors';
 import { authMiddleware } from '@/middleware/auth';
 
 export function middleware(req: NextRequest) {
-  const res = corsMiddleware(req); // ahora incluye headers
-
-  if (req.method === 'OPTIONS') {
-    return res;
-  }
-
-  // Autenticación condicional
+  //autenticación para todas las rutas excepto login y register
   const excludedPaths = ['/api/auth/login', '/api/auth/register'];
 
   if (!excludedPaths.includes(req.nextUrl.pathname)) {
@@ -17,10 +10,10 @@ export function middleware(req: NextRequest) {
     if (authResponse) return authResponse;
   }
 
-  return res;
+  return NextResponse.next();
 }
 
+//Se aplica el middleware a todas las rutas de la carpeta api
 export const config = {
   matcher: '/api/:path*',
 };
-

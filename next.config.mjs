@@ -7,7 +7,7 @@ const nextConfig = {
             headers: [
               {
                 key: "Access-Control-Allow-Origin",
-                value: "http://localhost:5173", // setear la URL del frontend
+                value: process.env.ORIGIN_URL, // setear la URL del frontend
               },
               {
                 key: "Access-Control-Allow-Methods",
@@ -16,6 +16,10 @@ const nextConfig = {
               {
                 key: "Access-Control-Allow-Headers",
                 value: "Content-Type, Authorization",
+              },
+              {
+                key: "Access-Control-Allow-Credentials",
+                value: "true",
               },
             ],
           },
