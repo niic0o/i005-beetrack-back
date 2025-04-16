@@ -46,6 +46,8 @@ export const updateProduct = async (
     );
   }
   const parsedData = updateProductRequestDto.parse(objData);
+  console.log(parsedData);
+  
   const updatedProduct = await prisma.product.update({
     where: {
       id: product.id,

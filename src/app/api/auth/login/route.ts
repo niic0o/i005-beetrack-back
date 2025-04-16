@@ -56,10 +56,12 @@ function sendAuthResponse(token: string) {
   response.cookies.set('token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    /*sameSite = 'none' permite que cualquier dominio haga fetch puede ser peligroso */
+    sameSite: 'none',
     maxAge: 60 * 60 * 24,
     path: '/',
   });
+
 
   return response;
 }

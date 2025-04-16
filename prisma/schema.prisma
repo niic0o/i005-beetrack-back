@@ -61,6 +61,7 @@ model Product {
   stock_min     Int
   stock_optimus Int
   cloudinary_id String?
+  alerts        Boolean       @default(true)
   orderItems    OrderLines[]
   store         Store         @relation(fields: [storeId], references: [id])
 }
