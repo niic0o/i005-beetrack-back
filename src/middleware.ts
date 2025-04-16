@@ -3,8 +3,7 @@ import { corsMiddleware } from '@/middleware/cors';
 import { authMiddleware } from '@/middleware/auth';
 
 export function middleware(req: NextRequest) {
-  const res = NextResponse.next();
-  corsMiddleware(req, res);
+  const res = corsMiddleware(req);
   if (req.method === 'OPTIONS') {
     return new NextResponse(null, {
       status: 204,

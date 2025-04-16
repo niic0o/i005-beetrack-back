@@ -55,8 +55,9 @@ function sendAuthResponse(token: string) {
 
   response.cookies.set('token', token, {
     httpOnly: true,
-    secure: true, // siempre true, aunque estés en localhost
-    sameSite: 'none', // este es clave para que funcione en cross-origin
+    secure: process.env.NODE_ENV === 'production',
+    /*sameSite = 'none' permite que cualquier dominio haga fetch puede ser peligroso */
+    sameSite: 'none',
     maxAge: 60 * 60 * 24,
     path: '/',
   });
