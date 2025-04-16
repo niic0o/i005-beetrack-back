@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const allowedOrigins = ['http://localhost:3000']; // agregá prod acá
+// Permitir todos los orígenes en desarrollo (dev)
+const devOrigins = '*'; // Esto permite cualquier dominio en desarrollo
+
+// Reemplazar con el dominio real de producción
+const prodOrigins = ['https://tuapp.com']; // Cambia por tu dominio real en producción
+
+const allowedOrigins =
+  process.env.NODE_ENV === 'production' ? prodOrigins : devOrigins;
 
 export function corsMiddleware(req: NextRequest) {
   const origin = req.headers.get('origin') || '';
   const res = NextResponse.next();
-  const isAllowed = allowedOrigins.includes(origin);
+
+  // En producción, solo se permite acceso desde orígenes específicos
+  const isAllowed = allowedOrigins === '*' || allowedOrigins.includes(origin);
 
   if (isAllowed) {
     res.headers.set('Access-Control-Allow-Origin', origin);
