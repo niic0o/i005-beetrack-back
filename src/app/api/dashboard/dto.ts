@@ -3,7 +3,7 @@
 import { z } from "zod";
 
 export const dashboardQuerySchema = z.object({
-  view: z.enum(["daily", "range", "compare", "top"]),
+  view: z.enum(["daily", "range", "compare", "top", "now"]),
   date: z.string().optional(),
   fromDate: z.string().optional(),
   toDate: z.string().optional(),
