@@ -11,7 +11,7 @@ import { Product } from "@prisma/client";
  * @function DashboardTopData permite obtener los datos procesados de los productos mas vendidos en un rango de fecha
  * @type {ViewType} permite definir el tipo de vista que se va a renderizar
  */
-export type ViewType = "daily" | "range" | "compare" | "top";
+export type ViewType = "daily" | "range" | "compare" | "top" | "now";
 
 export interface DashboardParams {
   storeId: string;
