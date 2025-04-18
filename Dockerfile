@@ -4,6 +4,8 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
+ARG ORIGIN_URL
+ENV ORIGIN_URL=$ORIGIN_URL
 RUN npx prisma generate --schema ./prisma/schema.prisma
 RUN npm run build
 

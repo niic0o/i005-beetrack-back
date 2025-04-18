@@ -58,6 +58,8 @@ jobs:
           push: true
           tags: |
             us-east1-docker.pkg.dev/${{ env.PROJECT_ID }}/beetrack-back/prod:latest
+          build-args: |
+            ORIGIN_URL=${{ secrets.ORIGIN_URL }}
           cache-from: type=registry,ref=us-east1-docker.pkg.dev/${{ env.PROJECT_ID }}/beetrack-back/buildcache
           cache-to: type=registry,ref=us-east1-docker.pkg.dev/${{ env.PROJECT_ID }}/beetrack-back/buildcache,mode=max
 
