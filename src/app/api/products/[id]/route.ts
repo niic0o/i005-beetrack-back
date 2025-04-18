@@ -12,15 +12,20 @@ import {
 import { handleError } from '@/lib/errors/errorHandler';
 import { successResponse } from '@/lib/responses';
 import { getTokenFromCookie } from '@/lib/getTokenFromCookie';
-import { ResourceNotFound, UnauthorizedError, ValidationError } from '@/lib/errors/customErrors';
+import {
+  ResourceNotFound,
+  UnauthorizedError,
+  ValidationError,
+} from '@/lib/errors/customErrors';
 import { getUserFromToken } from '@/lib/getUserFromToken';
+import { NextRequest } from 'next/server';
 
 export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const productId = params.id;
+    const { id: productId } = await params;
     const productToUpdate = await getProductById(productId);
     if (!productToUpdate) {
       throw new ResourceNotFound('El producto no existe');
@@ -61,11 +66,11 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _req: Request,
-  { params }: { params: { id: string } }
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const productId = params.id;
+    const { id: productId } = await params;
     const deletedProduct = await deleteProduct(productId);
     if (!deletedProduct) {
       throw new Error('Error al eliminar el producto');
@@ -78,11 +83,11 @@ export async function DELETE(
 }
 
 export async function GET(
-  _req: Request,
-  { params }: { params: { id: string } }
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const productId = params.id;
+    const { id: productId } = await params;
     const requiredProduct = await getProductById(productId);
     if (!requiredProduct) {
       throw new ResourceNotFound(
