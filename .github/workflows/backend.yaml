@@ -96,13 +96,13 @@ jobs:
       - name: Deploy to Cloud Run
         run: |
           docker run -d \
-          -p 3000:3000 \
-          -e DATABASE_URL="${{ env.DATABASE_URL_PRODUCTION }}" \
-          -e SECRET_KEY="${{ env.SECRET_KEY }}" \
-          -e CLOUDINARY_API_KEY="${{ env.CLOUDINARY_API_KEY }}" \
-          -e CLOUDINARY_SECRET_KEY="${{ env.CLOUDINARY_SECRET_KEY }}" \
-          -e ORIGIN_URL="{{ secrets.ORIGIN_URL }}" \
-          -e DEBUG: false \
-          --name beetrack-back \
-          --restart: unless-stopped \
-          us-east1-docker.pkg.dev/${{ env.PROJECT_ID }}/beetrack-back/prod:latest
+            -p 3000:3000 \
+            -e DATABASE_URL="${{ env.DATABASE_URL_PRODUCTION }}" \
+            -e SECRET_KEY="${{ env.SECRET_KEY }}" \
+            -e CLOUDINARY_API_KEY="${{ env.CLOUDINARY_API_KEY }}" \
+            -e CLOUDINARY_SECRET_KEY="${{ env.CLOUDINARY_SECRET_KEY }}" \
+            -e ORIGIN_URL="{{ secrets.ORIGIN_URL }}" \
+            -e DEBUG: false \
+            --name beetrack-back \
+            --restart: unless-stopped \
+            us-east1-docker.pkg.dev/${{ env.PROJECT_ID }}/beetrack-back/prod:latest
