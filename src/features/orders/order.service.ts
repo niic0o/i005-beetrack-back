@@ -29,8 +29,9 @@ function isProductsData(
 
 export const createOrder = async (data: CreateOrderRequestDto) => {
   try {
+    let paymentId: string | undefined;
+    let discountID: string | undefined;
     // Traer id del paymentMethod
-    let paymentId: string = '';
     if (
       data.paymentMethod &&
       Object.values(PaymentMethod).includes(data.paymentMethod)
@@ -45,13 +46,13 @@ export const createOrder = async (data: CreateOrderRequestDto) => {
     }
 
     // Traer info del discount
-    let discountId: string = '';
+
     if (data.discountRate) {
       const discount = await getOrCreateDiscount(data.discountRate);
       if (!discount) {
         throw new ValidationError('Error al obtener o crear el descuento');
       }
-      discountId = discount.id;
+      discountID = discount.id;
     }
 
     // Traer id, nombre, stock y precio de venta de cada producto en orderItems, chequeando que el stock sea suficiente para la cantidad pedida
@@ -75,16 +76,18 @@ export const createOrder = async (data: CreateOrderRequestDto) => {
     }
     const storeName = store.name;
     // Generar pdf y guardarlo en cloudinary
-    const dateForPdf = new Date().toLocaleString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    }).replace(',', '');
+    const dateForPdf = new Date()
+      .toLocaleString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      })
+      .replace(',', '');
     const discountForPdf = data.discountRate || 0;
-    const pdfPath =  generatePdf(
+    const pdfPath = generatePdf(
       dateForPdf,
       storeName,
       productsData,
@@ -102,8 +105,8 @@ export const createOrder = async (data: CreateOrderRequestDto) => {
     const newOrderData: OrderData = {
       status: OrderStatus.PAID,
       storeId: data.storeId,
-      paymentId,
-      discountID: discountId,
+      ...(paymentId && { paymentId }),
+      ...(discountID && { discountID }),
       subTotalAmount: Prisma.Decimal(calculationResult.subtotal),
       totalAmount: Prisma.Decimal(calculationResult.total),
       pdfPath: cloudinaryResult.secure_url,

@@ -87,7 +87,7 @@ model Order {
 
 model Discount {
   id          String   @id @default(uuid())
-  description String
+  description String?
   rate        Decimal  @db.Decimal(5, 2)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

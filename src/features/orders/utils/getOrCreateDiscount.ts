@@ -11,7 +11,6 @@ export default async function getOrCreateDiscount(discountRate: number) {
       const newDiscount = await prisma.discount.create({
         data: {
           rate: discountRate,
-          description: 'por ahora hardcodeada',
         },
       });
       return newDiscount;
