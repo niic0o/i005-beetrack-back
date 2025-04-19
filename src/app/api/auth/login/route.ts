@@ -57,7 +57,7 @@ function sendAuthResponse(token: string) {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     /*sameSite = 'none' permite que cualquier dominio haga fetch puede ser peligroso */
-    sameSite: 'none',
+    sameSite: 'lax',
     maxAge: 60 * 60 * 24,
     path: '/',
   });
