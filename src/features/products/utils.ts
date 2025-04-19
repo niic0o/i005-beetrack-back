@@ -53,7 +53,7 @@ export const setProductStatus = (
   stock: number,
   stock_min: number,
   stock_optimus: number
-): string => {
+): ProductStatus => {
   if (stock === 0) {
     return ProductStatus.SOLDOUT;
   } else if (stock < stock_min) {
