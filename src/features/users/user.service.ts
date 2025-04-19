@@ -1,8 +1,10 @@
-import { prisma } from '@/lib/prisma';
-import { createHash } from './utils';
-import { UserData } from "./user.dto";
-import { ValidationError } from '@/lib/errors/customErrors';
-
+import { prisma } from "@/lib/prisma"; //para realizar queries a la bdd
+import { createHash } from "./utils";
+import { ProfileData, StoreData, UserSafeData } from "./user.dto";
+import { ValidationError } from "@/lib/errors/customErrors";
+import { Store } from "@prisma/client"; //para tipar un tipo de dato usando el modelo de la bdd
+import { updateUserRequestDto } from "./DTOs/updateUserRequestDto";
+import { updateStoreRequestDto } from "./DTOs/updateStoreRequestDto";
 // esta funcion es para el login
 export async function getUserByEmail(email: string) {
   return prisma.user.findUnique({
@@ -42,7 +44,7 @@ export const registerUserAndStore = async (data: {
     const result = await prisma.$transaction(async (tx) => {
       // 1. Chequear si ya existe el usuario
       const existingUser = await tx.user.findUnique({ where: { email } });
-      if (existingUser) throw new ValidationError('El usuario ya existe');
+      if (existingUser) throw new ValidationError("El usuario ya existe");
 
       // 2. Crear el usuario
       const hashedPassword = await createHash(password);
@@ -93,12 +95,15 @@ export const registerUserAndStore = async (data: {
 
 /**
  * Obtiene el perfil del usuario y los datos de su tienda.
- * 
+ *
  * @param userId - ID del usuario a obtener
  * @param storeId - ID de la tienda a asociar
  * @returns Los datos del usuario junto con los datos de la tienda
  */
-export const getUserProfile = async (userId: string, storeId: string): Promise<UserData | null> => {
+export const getUserProfile = async (
+  userId: string,
+  storeId: string
+): Promise<ProfileData | null> => {
   const profile = await prisma.user.findUnique({
     where: { id: userId },
   });
@@ -111,7 +116,7 @@ export const getUserProfile = async (userId: string, storeId: string): Promise<U
     where: { id: storeId },
   });
 
-  const profileResponse: UserData = {
+  const profileResponse: ProfileData = {
     id: profile.id,
     name: profile.name,
     last_name: profile.last_name,
@@ -120,18 +125,57 @@ export const getUserProfile = async (userId: string, storeId: string): Promise<U
     status: profile.status,
     createdAt: profile.createdAt,
     updatedAt: profile.updatedAt,
-    store: store ? {
-      id: store.id,
-      name: store.name,
-      tel: store.tel,
-      address: store.address,
-      createdAt: store.createdAt,
-      updatedAt: store.updatedAt,
-      status: store.status,
-    } : null, // Manejo de null para si no existe la tienda
+    store: store
+      ? {
+          id: store.id,
+          name: store.name,
+          tel: store.tel,
+          address: store.address,
+          createdAt: store.createdAt,
+          updatedAt: store.updatedAt,
+          status: store.status,
+        }
+      : null, // Manejo de null para si no existe la tienda
   };
 
   return profileResponse;
+};
+
+/* Funcion update user */
+
+export const updateUser = async (
+  user: UserSafeData,
+  userData: Partial<UserSafeData>
+) => {
+  const parsedData = updateUserRequestDto.parse(userData);
+  console.log("Desde userService el store parseado: ", parsedData);
+
+  const updatedUser = await prisma.user.update({
+    where: {
+      id: user.id,
+    },
+    data: parsedData,
+  });
+
+  return updatedUser;
+};
+
+/* Funcion update store */
+
+export const updateStore = async (
+  store: Store,
+  storeData: Partial<Store>
+): Promise<StoreData> => {
+  const parsedData = updateStoreRequestDto.parse(storeData);
+
+  const updatedStore = await prisma.store.update({
+    where: {
+      id: store.id,
+    },
+    data: parsedData,
+  });
+
+  return updatedStore;
 };
 
 /* Funcion delete user
