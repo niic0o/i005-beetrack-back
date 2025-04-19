@@ -1,5 +1,4 @@
 import {
-  deleteProduct,
   getProductById,
   updateProduct,
 } from '../../../../features/products/product.service';
@@ -60,23 +59,6 @@ export async function PATCH(
     formData.append('storeId', user.storeId);
     const updatedProduct = await updateProduct(productToUpdate, formData);
     return successResponse(updatedProduct);
-  } catch (error) {
-    return handleError(error);
-  }
-}
-
-export async function DELETE(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id: productId } = await params;
-    const deletedProduct = await deleteProduct(productId);
-    if (!deletedProduct) {
-      throw new Error('Error al eliminar el producto');
-    }
-    await deleteFile(deletedProduct.cloudinary_id!);
-    return successResponse('Producto eliminado correctamente');
   } catch (error) {
     return handleError(error);
   }

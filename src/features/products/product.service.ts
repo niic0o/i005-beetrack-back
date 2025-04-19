@@ -79,12 +79,3 @@ export const getProductByBarcode = async (
   });
   return product;
 };
-
-export const deleteProduct = async (productId: string): Promise<Product> => {
-  const deletedProduct = await prisma.product.delete({
-    where: {
-      id: productId,
-    }
-  });
-  return deletedProduct;
-};

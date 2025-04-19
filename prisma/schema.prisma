@@ -58,6 +58,7 @@ model Product {
   imagePath     String?
   salesPrice    Decimal       @db.Decimal(9, 2)
   status        ProductStatus @default(LIMITED)
+  is_active     Boolean       @default(true)
   stock_min     Int
   stock_optimus Int
   cloudinary_id String?
