@@ -36,7 +36,6 @@ export const updateProduct = async (
   productData: FormData
 ): Promise<Product> => {
   const objData = formDataToObject(productData);
-  console.log(objData);
 
   if (objData.stock) {
     objData.status = setProductStatus(
@@ -46,8 +45,7 @@ export const updateProduct = async (
     );
   }
   const parsedData = updateProductRequestDto.parse(objData);
-  console.log(parsedData);
-  
+
   const updatedProduct = await prisma.product.update({
     where: {
       id: product.id,

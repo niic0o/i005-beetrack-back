@@ -1,4 +1,5 @@
 import {
+  getProductByBarcode,
   getProductById,
   updateProduct,
 } from '../../../../features/products/product.service';
@@ -70,7 +71,11 @@ export async function GET(
 ) {
   try {
     const { id: productId } = await params;
-    const requiredProduct = await getProductById(productId);
+    const isBarcode = /^\d+$/.test(productId);
+    const requiredProduct = isBarcode
+      ? await getProductByBarcode(productId)
+      : await getProductById(productId);
+
     if (!requiredProduct) {
       throw new ResourceNotFound(
         'El producto requerido no existe en la base de datos'
