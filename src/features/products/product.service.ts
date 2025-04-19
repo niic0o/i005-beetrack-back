@@ -7,7 +7,7 @@ import { setProductStatus } from './utils';
 
 export const createProduct = async (formData: FormData): Promise<Product> => {
   const obj = formDataToObject(formData);
-  
+
   const productStatus = setProductStatus(
     Number(obj.stock),
     Number(obj.stock_min),
@@ -15,17 +15,21 @@ export const createProduct = async (formData: FormData): Promise<Product> => {
   );
   obj.status = productStatus;
   const productData = createProductRequestDto.parse(obj);
-  
+
   const productCreated = await prisma.product.create({
     data: productData,
   });
   return productCreated;
 };
 
-export const getAllProducts = async (storeId: string): Promise<Product[]> => {
+export const getAllProducts = async (
+  storeId: string,
+  isActive?: boolean
+): Promise<Product[]> => {
   const products = await prisma.product.findMany({
     where: {
       storeId,
+      ...(isActive !== undefined && { is_active: isActive }),
     },
   });
   return products;
