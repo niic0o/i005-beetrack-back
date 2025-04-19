@@ -102,44 +102,58 @@ export const registerUserAndStore = async (data: {
  */
 export const getUserProfile = async (
   userId: string,
-  storeId: string
+  storeId?: string
 ): Promise<ProfileData | null> => {
   const profile = await prisma.user.findUnique({
     where: { id: userId },
+    select: {
+      id: true,
+      name: true,
+      last_name: true,
+      email: true,
+      birthdate: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+      userStores: {
+        select: {
+          store: {
+            select: {
+              id: true,
+              name: true,
+              tel: true,
+              address: true,
+              status: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          },
+        },
+      },
+    },
   });
 
-  if (!profile) {
-    return null;
-  }
+  if (!profile) return null;
 
-  const store = await prisma.store.findUnique({
-    where: { id: storeId },
-  });
+  const stores = profile.userStores.map((us) => us.store);
 
-  const profileResponse: ProfileData = {
+  const selectedStore = storeId
+    ? stores.find((s) => s.id === storeId) || null
+    : null;
+
+  return {
     id: profile.id,
     name: profile.name,
     last_name: profile.last_name,
-    birthdate: profile.birthdate,
     email: profile.email,
+    birthdate: profile.birthdate,
     status: profile.status,
     createdAt: profile.createdAt,
     updatedAt: profile.updatedAt,
-    store: store
-      ? {
-          id: store.id,
-          name: store.name,
-          tel: store.tel,
-          address: store.address,
-          createdAt: store.createdAt,
-          updatedAt: store.updatedAt,
-          status: store.status,
-        }
-      : null, // Manejo de null para si no existe la tienda
+    store: selectedStore, // puede ser null si no hay coincidencia
   };
-
-  return profileResponse;
 };
+
 
 /* Funcion update user */
 
