@@ -1,6 +1,6 @@
 import { $Enums } from "@prisma/client";
 
-export interface UserData {
+export interface UserSafeData {
   id: string;
   name: string;
   last_name: string;
@@ -9,7 +9,9 @@ export interface UserData {
   status: $Enums.Status;
   createdAt: Date;
   updatedAt: Date;
-  store: {
+}
+
+export interface StoreData {
     id: string;
     name: string;
     tel: string | null;
@@ -17,5 +19,8 @@ export interface UserData {
     createdAt: Date;
     updatedAt: Date;
     status: $Enums.Status;
-  } | null;
 }
+
+export interface ProfileData extends UserSafeData {
+  store: StoreData | null;
+};
