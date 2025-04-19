@@ -5,8 +5,9 @@ import { handleError } from "@/lib/errors/errorHandler";
 import { getUserProfile, updateUser } from "@/features/users/user.service";
 import { successResponse } from "@/lib/responses";
 import { ProfileData } from "@/features/users/user.dto";
+import { NextRequest} from "next/server";
 
-export async function PATCH(req: Request) {
+export async function PATCH(req: NextRequest) {
   try {
     const token = getTokenFromCookie(req);
 
