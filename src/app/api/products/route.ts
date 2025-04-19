@@ -14,7 +14,6 @@ import {
   ValidationError,
 } from '@/lib/errors/customErrors';
 import { getUserFromToken } from '@/lib/getUserFromToken';
-import { querySearchParamsValidator } from '@/features/products/DTOs/querySearchParamsValidator';
 
 export async function GET(req: Request) {
   try {
@@ -27,9 +26,8 @@ export async function GET(req: Request) {
       throw new ResourceNotFound('Usuario no encontrado');
     }
     const url = new URL(req.url);
-    const params = Object.fromEntries(url.searchParams.entries());
-    const parse = querySearchParamsValidator.safeParse(params);
-    const products = await getAllProducts(user.storeId, parse.data?.isActive);
+    const params = Object.fromEntries(url.searchParams.entries());    
+    const products = await getAllProducts(user.storeId, params);
     return successResponse(products);
   } catch (error) {
     return handleError(error);

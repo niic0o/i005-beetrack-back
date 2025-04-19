@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma';
 import { Product } from '@prisma/client';
 import { formDataToObject } from './Mappers/formDataToObject';
 import { setProductStatus } from './utils';
+import { querySearchParamsValidator } from './DTOs/querySearchParamsValidator';
+import { PaginationResult } from './types';
 
 export const createProduct = async (formData: FormData): Promise<Product> => {
   const obj = formDataToObject(formData);
@@ -24,15 +26,37 @@ export const createProduct = async (formData: FormData): Promise<Product> => {
 
 export const getAllProducts = async (
   storeId: string,
-  isActive?: boolean
-): Promise<Product[]> => {
-  const products = await prisma.product.findMany({
-    where: {
-      storeId,
-      ...(isActive !== undefined && { is_active: isActive }),
-    },
-  });
-  return products;
+  params?: Record<string, string>
+): Promise<Product[] | PaginationResult> => {
+  try {
+    let whereValues: Record<string, string | boolean> = { storeId };
+    if (params) {
+      const parsedParams = querySearchParamsValidator.safeParse(params);
+
+      if (parsedParams.data?.isActive) {
+        whereValues.is_active = parsedParams.data.isActive;
+      }
+      if (parsedParams.data?.page && parsedParams.data.limit) {
+        const skip = (parsedParams.data?.page - 1) * parsedParams.data.limit;
+        const [items, totalItems] = await Promise.all([
+          prisma.product.findMany({
+            where: whereValues,
+            skip,
+            take: parsedParams.data.limit,
+          }),
+          prisma.product.findMany({ where: whereValues }),
+        ]);
+        const total = totalItems.length;
+        return { items, total };
+      }
+    }
+    const products = await prisma.product.findMany({
+      where: whereValues,
+    });
+    return products;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const updateProduct = async (
