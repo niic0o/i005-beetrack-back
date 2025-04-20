@@ -1,5 +1,5 @@
 import {
-  deleteProduct,
+  getProductByBarcode,
   getProductById,
   updateProduct,
 } from '../../../../features/products/product.service';
@@ -65,30 +65,17 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id: productId } = await params;
-    const deletedProduct = await deleteProduct(productId);
-    if (!deletedProduct) {
-      throw new Error('Error al eliminar el producto');
-    }
-    await deleteFile(deletedProduct.cloudinary_id!);
-    return successResponse('Producto eliminado correctamente');
-  } catch (error) {
-    return handleError(error);
-  }
-}
-
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id: productId } = await params;
-    const requiredProduct = await getProductById(productId);
+    const isBarcode = /^\d+$/.test(productId);
+    const requiredProduct = isBarcode
+      ? await getProductByBarcode(productId)
+      : await getProductById(productId);
+
     if (!requiredProduct) {
       throw new ResourceNotFound(
         'El producto requerido no existe en la base de datos'

@@ -4,10 +4,12 @@ import { prisma } from '@/lib/prisma';
 import { Product } from '@prisma/client';
 import { formDataToObject } from './Mappers/formDataToObject';
 import { setProductStatus } from './utils';
+import { querySearchParamsValidator } from './DTOs/querySearchParamsValidator';
+import { PaginationResult } from './types';
 
 export const createProduct = async (formData: FormData): Promise<Product> => {
   const obj = formDataToObject(formData);
-  
+
   const productStatus = setProductStatus(
     Number(obj.stock),
     Number(obj.stock_min),
@@ -15,20 +17,46 @@ export const createProduct = async (formData: FormData): Promise<Product> => {
   );
   obj.status = productStatus;
   const productData = createProductRequestDto.parse(obj);
-  
+
   const productCreated = await prisma.product.create({
     data: productData,
   });
   return productCreated;
 };
 
-export const getAllProducts = async (storeId: string): Promise<Product[]> => {
-  const products = await prisma.product.findMany({
-    where: {
-      storeId,
-    },
-  });
-  return products;
+export const getAllProducts = async (
+  storeId: string,
+  params?: Record<string, string>
+): Promise<Product[] | PaginationResult> => {
+  try {
+    let whereValues: Record<string, string | boolean> = { storeId };
+    if (params) {
+      const parsedParams = querySearchParamsValidator.safeParse(params);
+
+      if (parsedParams.data?.isActive) {
+        whereValues.is_active = parsedParams.data.isActive;
+      }
+      if (parsedParams.data?.page && parsedParams.data.limit) {
+        const skip = (parsedParams.data?.page - 1) * parsedParams.data.limit;
+        const [items, totalItems] = await Promise.all([
+          prisma.product.findMany({
+            where: whereValues,
+            skip,
+            take: parsedParams.data.limit,
+          }),
+          prisma.product.findMany({ where: whereValues }),
+        ]);
+        const total = totalItems.length;
+        return { items, total };
+      }
+    }
+    const products = await prisma.product.findMany({
+      where: whereValues,
+    });
+    return products;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const updateProduct = async (
@@ -36,7 +64,6 @@ export const updateProduct = async (
   productData: FormData
 ): Promise<Product> => {
   const objData = formDataToObject(productData);
-  console.log(objData);
 
   if (objData.stock) {
     objData.status = setProductStatus(
@@ -46,8 +73,7 @@ export const updateProduct = async (
     );
   }
   const parsedData = updateProductRequestDto.parse(objData);
-  console.log(parsedData);
-  
+
   const updatedProduct = await prisma.product.update({
     where: {
       id: product.id,
@@ -78,13 +104,4 @@ export const getProductByBarcode = async (
     },
   });
   return product;
-};
-
-export const deleteProduct = async (productId: string): Promise<Product> => {
-  const deletedProduct = await prisma.product.delete({
-    where: {
-      id: productId,
-    }
-  });
-  return deletedProduct;
 };

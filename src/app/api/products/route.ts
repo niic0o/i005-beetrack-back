@@ -8,7 +8,11 @@ import { successResponse } from '@/lib/responses';
 import { handleError } from '@/lib/errors/errorHandler';
 import { isValidFile } from '../../../features/products/utils';
 import { getTokenFromCookie } from '@/lib/getTokenFromCookie';
-import { ResourceNotFound, UnauthorizedError, ValidationError } from '@/lib/errors/customErrors';
+import {
+  ResourceNotFound,
+  UnauthorizedError,
+  ValidationError,
+} from '@/lib/errors/customErrors';
 import { getUserFromToken } from '@/lib/getUserFromToken';
 
 export async function GET(req: Request) {
@@ -21,7 +25,9 @@ export async function GET(req: Request) {
     if (!user) {
       throw new ResourceNotFound('Usuario no encontrado');
     }
-    const products = await getAllProducts(user.storeId);
+    const url = new URL(req.url);
+    const params = Object.fromEntries(url.searchParams.entries());    
+    const products = await getAllProducts(user.storeId, params);
     return successResponse(products);
   } catch (error) {
     return handleError(error);

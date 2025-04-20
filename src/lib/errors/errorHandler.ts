@@ -38,6 +38,16 @@ export function handleError(error: unknown, message?: string) {
         { status: 400 }
       );
     }
+    if (error.code === 'P2034') {
+      return NextResponse.json(
+        {
+          status: 'fail',
+          message:
+            'La transacción falló debido a un conflicto de escritura o un bloqueo.',
+        },
+        { status: 400 }
+      );
+    }
     return NextResponse.json(
       {
         status: 'fail',

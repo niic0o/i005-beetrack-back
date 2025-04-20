@@ -1,3 +1,5 @@
+[![GCP Production CI/CD Pipeline](https://github.com/IgrowkerTraining/i005-beetrack-back/actions/workflows/backend.yaml/badge.svg)](https://github.com/IgrowkerTraining/i005-beetrack-back/actions/workflows/backend.yaml)
+
 # Backend de Beetrack
 
 ## Para probar localmente
@@ -31,7 +33,7 @@ npm run dev
 | GET  | `/api/products`  | Devuelve todos los productos | _Sin body_ | `200 OK` Lista de productos<br>`500` Error interno |
 | POST |  `/api/products` | Crea un nuevo producto | formData (ver campos requeridos abajo) | `201 OK` Producto creado<br>`400` Error de validación<br>`500` Error interno |
 | PATCH |  `/api/products/:id` | Actualiza un producto | formData (1 o más campos del ejemplo de crear producto) | `200 OK` Producto actualizado<br>`400` Error de validación<br>`500` Error interno |
-| DELETE |  `/api/products/:id` | Elimina un  producto | _Sin body_ | `200 OK` Producto eliminado<br>`500` Error interno |
+| POST  | `/api/orders`   | Crea una nueva orden  | ver ejemplo más abajo |  `201 OK` Orden creada<br>`400` Error de validación<br>`500` Error interno |
 
 ## Ejemplo de Body para /api/auth/register
 ```json
@@ -44,6 +46,23 @@ npm run dev
     "storeName": "Super Juan",
     "storeAddress": "Calle Siempre Viva 123",
     "storeTel": "12345678"
+}
+```
+## Ejemplo de Body para /api/orders
+```json
+{
+    "discountRate": 5,
+    "paymentMethod": "CASH",
+    "orderItems": [
+        {
+            "productId": "e3a6880b-d9f2-481d-9721-71f24b689754",
+            "quantity": 1
+        },
+        {
+            "productId": "690f9906-7893-4ae7-b958-998ebf66e0ac",
+            "quantity": 1
+        }
+    ]
 }
 ```
 
