@@ -1,3 +1,5 @@
+[![GCP Production CI/CD Pipeline](https://github.com/IgrowkerTraining/i005-beetrack-back/actions/workflows/backend.yaml/badge.svg)](https://github.com/IgrowkerTraining/i005-beetrack-back/actions/workflows/backend.yaml)
+
 # Backend de Beetrack
 
 ## Para probar localmente
