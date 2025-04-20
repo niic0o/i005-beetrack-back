@@ -7,7 +7,7 @@ export default function calculateSubtotalAndTotal(
   let subtotal: number = 0;
   let total: number = 0;
   for (const product of productData) {
-    subtotal += product.salesPrice;
+    subtotal += product.salesPrice * product.quantity;
   }
   if (discountRate) {
     total = subtotal - subtotal * (discountRate / 100);
