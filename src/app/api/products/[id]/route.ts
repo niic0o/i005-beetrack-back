@@ -66,14 +66,22 @@ export async function PATCH(
 }
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const token = getTokenFromCookie(req);
+    if (!token) {
+      throw new UnauthorizedError('Token inválido o faltante');
+    }
+    const user = await getUserFromToken(token);
+    if (!user) {
+      throw new ResourceNotFound('Usuario no encontrado');
+    }
     const { id: productId } = await params;
     const isBarcode = /^\d+$/.test(productId);
     const requiredProduct = isBarcode
-      ? await getProductByBarcode(productId)
+      ? await getProductByBarcode(productId, user.storeId)
       : await getProductById(productId);
 
     if (!requiredProduct) {
