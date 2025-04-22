@@ -96,11 +96,13 @@ export const getProductById = async (
 };
 
 export const getProductByBarcode = async (
-  barcode: string
+  barcode: string,
+  storeId: string,
 ): Promise<Product | null> => {
-  const product = await prisma.product.findUnique({
+  const product = await prisma.product.findFirst({
     where: {
       barcode,
+      storeId
     },
   });
   return product;
