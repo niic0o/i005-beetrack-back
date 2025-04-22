@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+[![GCP Production CI/CD Pipeline](https://github.com/IgrowkerTraining/i005-beetrack-back/actions/workflows/backend.yaml/badge.svg)](https://github.com/IgrowkerTraining/i005-beetrack-back/actions/workflows/backend.yaml)
 
-## Getting Started
+# Backend de Beetrack
 
-First, run the development server:
+## Para probar localmente
+
+### - Clonar el repositorio:
 
 ```bash
+git clone https://github.com/IgrowkerTraining/i005-beetrack-back.git
+```
+### - Instalar las dependencias:
+```bash
+npm install
+```
+### - Crear un archivo .env en la raiz del proyecto con las variables del .env.example.
+
+### - Correr el proyecto en modo de  desarrollo:
+```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+### La API estará corriendo en http://localhost:3000
+
+# API de Beetrack
+
+## Endpoints
+
+| Método | Ruta              | Descripción                          | Body requerido                                     | Respuestas posibles                           |
+|--------|-------------------|--------------------------------------|---------------------------------------------------|----------------------------------------------|
+| POST   | `/api/auth/register` | Registra un nuevo usuario            | Ver ejemplo abajo    | `201 OK` Usuario creado<br>`400` Error de validación<br>`500` Error interno |
+| POST   | `/api/auth/login`    | Crea la cookie con el token           | `{ "email": string, "password": string }`         | `200 OK` Login exitoso<br>`400/401` Error credenciales<br>`500` Error interno |
+| POST   | `/api/auth/logout`   | Destruye la cookie        | _Sin body_                                        | `202 OK` Logout exitoso<br>`500` Error interno | 
+| GET  | `/api/products`  | Devuelve todos los productos | _Sin body_ | `200 OK` Lista de productos<br>`500` Error interno |
+| POST |  `/api/products` | Crea un nuevo producto | formData (ver campos requeridos abajo) | `201 OK` Producto creado<br>`400` Error de validación<br>`500` Error interno |
+| PATCH |  `/api/products/:id` | Actualiza un producto | formData (1 o más campos del ejemplo de crear producto) | `200 OK` Producto actualizado<br>`400` Error de validación<br>`500` Error interno |
+| POST  | `/api/orders`   | Crea una nueva orden  | ver ejemplo más abajo |  `201 OK` Orden creada<br>`400` Error de validación<br>`500` Error interno |
+| GET  | `/api/orders`  | Devuelve por defecto 10 ordenes (acepta 'limit' como query param) | _Sin body_ | `200 OK` Lista de ordenes<br>`500` Error interno |
+
+## Ejemplo de Body para /api/auth/register
+```json
+{
+    "name": "Juan",
+    "last_name": "Pérez",
+    "email": "example@email.com",
+    "birthdate": "1985-05-02",
+    "password": "1234",
+    "storeName": "Super Juan",
+    "storeAddress": "Calle Siempre Viva 123",
+    "storeTel": "12345678"
+}
+```
+## Ejemplo de Body para /api/orders
+```json
+{
+    "discountRate": 5,
+    "paymentMethod": "CASH",
+    "orderItems": [
+        {
+            "productId": "e3a6880b-d9f2-481d-9721-71f24b689754",
+            "quantity": 1
+        },
+        {
+            "productId": "690f9906-7893-4ae7-b958-998ebf66e0ac",
+            "quantity": 1
+        }
+    ]
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Campos requeridos en el formData para /api/products
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+  name: string,
+  barcode: string,
+  salesPrice: string,
+  costPrice: string,
+  stock: string,
+  stock_optimus: string,
+  stock_min: string,
+  file: File,(*)
+  description: string (opcional)
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```
 
-## Learn More
+(*) La imágen del producto debe ser de hasta 2MB y estar en formato jpg/jpeg/png/webp
 
-To learn more about Next.js, take a look at the following resources:
+## Autenticación
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- El token JWT se entrega en una cookie con las siguientes características:
+  - `httpOnly: true`
+  - `secure: true` (en producción)
+  - `sameSite: 'lax'`
+  - `maxAge: 1 día` 
+  - `path: '/'`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Notas
 
-## Deploy on Vercel
+- Como todavía no se van a implementar roles desde el frontend, los usuarios se crean con un rol "ADMIN" por defecto.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
