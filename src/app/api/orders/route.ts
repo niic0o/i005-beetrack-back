@@ -1,5 +1,5 @@
 import { createOrderRequestDto } from '@/features/orders/DTOs/createOrderRequestDto';
-import { createOrder } from '@/features/orders/order.service';
+import { createOrder, getOrders } from '@/features/orders/order.service';
 import {
   ResourceNotFound,
   UnauthorizedError,
@@ -9,7 +9,7 @@ import { handleError } from '@/lib/errors/errorHandler';
 import { getTokenFromCookie } from '@/lib/getTokenFromCookie';
 import { getUserFromToken } from '@/lib/getUserFromToken';
 import { successResponse } from '@/lib/responses';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
@@ -43,5 +43,24 @@ export async function POST(req: Request) {
       );
     }
     return handleError(error);
+  }
+}
+
+export async function GET (req: NextRequest) {
+  try {
+    const token = getTokenFromCookie(req);
+    if (!token) {
+      throw new UnauthorizedError('Token inválido o faltante');
+    }
+    const user = await getUserFromToken(token);
+    if (!user) {
+      throw new ResourceNotFound('Usuario no encontrado');
+    }
+    const url = new URL(req.url);
+    const params = Object.fromEntries(url.searchParams.entries());
+    const orders = await getOrders(user.storeId, params)
+    return successResponse(orders)
+  } catch (error) {
+    return handleError(error)
   }
 }

@@ -1,6 +1,9 @@
 {
   "name": "template-react-nextjs-ts",
   "version": "0.1.0",
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,6 +12,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.7.0",
     "@prisma/client": "^6.5.0",
     "bcrypt": "^5.1.1",
     "cloudinary": "^2.6.0",
@@ -31,6 +35,7 @@
     "eslint-config-next": "15.2.4",
     "postcss": "^8.5.3",
     "prisma": "^6.5.0",
+    "tsx": "^4.19.3",
     "typescript": "^5"
   }
 }

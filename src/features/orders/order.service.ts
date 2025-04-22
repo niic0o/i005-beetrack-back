@@ -1,5 +1,5 @@
 // Prisma
-import { PaymentMethod, Prisma, OrderStatus } from '@prisma/client';
+import { PaymentMethod, Prisma, OrderStatus, Order } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 
 // Funciones auxiliares
@@ -15,7 +15,8 @@ import createOrderAndUpdateProducts from './utils/createOrderAndUpdateProducts';
 // Tipos | DTOs
 import { CreateOrderRequestDto } from './DTOs/createOrderRequestDto';
 import { ValidationError } from '@/lib/errors/customErrors';
-import { Errors, ProductsData } from './types';
+import { querySearchParamsValidator } from '../products/DTOs/querySearchParamsValidator';
+import { Errors, OrderWithPaymentAndDiscount, ProductsData } from './types';
 import { OrderData } from './types';
 
 // Mappers
@@ -134,4 +135,35 @@ export const createOrder = async (data: CreateOrderRequestDto) => {
     console.log(error);
     throw error;
   }
+};
+
+export const getOrders = async (
+  storeId: string,
+  params?: Record<string, string>
+): Promise<OrderWithPaymentAndDiscount[]> => {
+  let limit: number = 10;
+  if (params) {
+    const parsedParams = querySearchParamsValidator.safeParse(params);
+    if (parsedParams.data?.limit) {
+      limit = parsedParams.data.limit;
+    }
+  }
+  
+  const orders = await prisma.order.findMany({
+    where: { storeId },
+    select: {
+      id: true,
+      status: true,
+      subTotalAmount: true,
+      totalAmount: true,
+      payment: true,
+      pdfPath: true,
+      discount: { select: { rate: true, id: true } },
+      createdAt: true,
+      updatedAt: true,
+    },
+    take: limit,
+  });
+
+  return orders;
 };

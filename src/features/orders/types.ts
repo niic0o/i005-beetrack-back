@@ -1,4 +1,11 @@
-import { OrderLines, OrderStatus, Prisma } from '@prisma/client';
+import {
+  Discount,
+  Order,
+  OrderLines,
+  OrderStatus,
+  Payment,
+  Prisma,
+} from '@prisma/client';
 
 export interface OrderData {
   status: OrderStatus;
@@ -47,3 +54,8 @@ export interface OrderResponse {
   paymentMethod: string;
   date: Date;
 }
+
+export type OrderWithPaymentAndDiscount = Omit<
+  Order,
+  'storeId' | 'cloudinary_id' | 'paymentId' | 'discountID'
+> & { payment: Payment | null; discount: Pick<Discount, 'id' | 'rate'> | null };
