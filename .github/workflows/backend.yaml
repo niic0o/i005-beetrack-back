@@ -19,6 +19,9 @@ env:
   CLOUDINARY_CLOUD_NAME: "${{ secrets.CLOUDINARY_CLOUD_NAME }}"
   CLOUDINARY_API_KEY: "${{ secrets.CLOUDINARY_API_KEY }}"
   CLOUDINARY_SECRET_KEY: "${{ secrets.CLOUDINARY_SECRET_KEY }}"
+  CRON_API_KEY: "${{ secrets.CRON_API_KEY }}"
+  TEST_USER_EMAI: "${{ secrets.TEST_USER_EMAIL }}"
+  TEST_USER_PASSWORD: "${{ secrets.TEST_USER_PASSWORD }}"
 
 jobs:
   build-and-push-image:
