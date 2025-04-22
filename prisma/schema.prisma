@@ -47,7 +47,7 @@ model Store {
 
 model Product {
   id            String        @id @default(uuid())
-  barcode       String        @unique
+  barcode       String        
   name          String
   stock         Int
   description   String?
@@ -65,6 +65,7 @@ model Product {
   alerts        Boolean       @default(true)
   orderItems    OrderLines[]
   store         Store         @relation(fields: [storeId], references: [id])
+  @@unique([storeId, barcode])
 }
 
 model Order {
