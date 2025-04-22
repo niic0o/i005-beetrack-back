@@ -1,10 +1,22 @@
 import { prisma } from "@/lib/prisma"; //para realizar queries a la bdd
 import { createHash } from "./utils";
 import { ProfileData, StoreData, UserSafeData } from "./user.dto";
-import { ValidationError } from "@/lib/errors/customErrors";
+import { ValidationError, ForbiddenError } from "@/lib/errors/customErrors";
 import { Store } from "@prisma/client"; //para tipar un tipo de dato usando el modelo de la bdd
 import { updateUserRequestDto } from "./DTOs/updateUserRequestDto";
 import { updateStoreRequestDto } from "./DTOs/updateStoreRequestDto";
+
+// checkear email antes de seguir el proceso de registro
+export async function checkEmailExists(email: string) {
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+  if (!user) return false;
+  if (user.status === "BLOCKED") {
+    throw new ForbiddenError("El usuario está registado pero se ha dado de baja");
+  }
+  return true;
+}
 // esta funcion es para el login
 export async function getUserByEmail(email: string) {
   return prisma.user.findUnique({
@@ -153,7 +165,6 @@ export const getUserProfile = async (
     store: selectedStore, // puede ser null si no hay coincidencia
   };
 };
-
 
 /* Funcion update user */
 
