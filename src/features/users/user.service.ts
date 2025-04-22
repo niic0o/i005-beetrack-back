@@ -5,6 +5,14 @@ import { ValidationError } from "@/lib/errors/customErrors";
 import { Store } from "@prisma/client"; //para tipar un tipo de dato usando el modelo de la bdd
 import { updateUserRequestDto } from "./DTOs/updateUserRequestDto";
 import { updateStoreRequestDto } from "./DTOs/updateStoreRequestDto";
+
+// checkear email antes de seguir el proceso de registro
+export async function checkEmailExists(email: string) {
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+  return !!user;
+}
 // esta funcion es para el login
 export async function getUserByEmail(email: string) {
   return prisma.user.findUnique({
@@ -153,7 +161,6 @@ export const getUserProfile = async (
     store: selectedStore, // puede ser null si no hay coincidencia
   };
 };
-
 
 /* Funcion update user */
 
