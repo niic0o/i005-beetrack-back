@@ -34,6 +34,7 @@ npm run dev
 | POST |  `/api/products` | Crea un nuevo producto | formData (ver campos requeridos abajo) | `201 OK` Producto creado<br>`400` Error de validación<br>`500` Error interno |
 | PATCH |  `/api/products/:id` | Actualiza un producto | formData (1 o más campos del ejemplo de crear producto) | `200 OK` Producto actualizado<br>`400` Error de validación<br>`500` Error interno |
 | POST  | `/api/orders`   | Crea una nueva orden  | ver ejemplo más abajo |  `201 OK` Orden creada<br>`400` Error de validación<br>`500` Error interno |
+| GET  | `/api/orders`  | Devuelve por defecto 10 ordenes (acepta 'limit' como query param) | _Sin body_ | `200 OK` Lista de ordenes<br>`500` Error interno |
 
 ## Ejemplo de Body para /api/auth/register
 ```json
