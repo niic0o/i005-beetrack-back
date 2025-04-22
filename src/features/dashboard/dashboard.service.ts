@@ -158,10 +158,10 @@ export const getDashboardData = async ({
     } satisfies AggregatedReport;
   }
 
-  const totalSales = todayOrders.reduce((sum, order) => {
-    const items = order.orderItems ?? [];
-    return sum + items.reduce((lineSum, item) => lineSum + Number(item.totalSalesPrice), 0);
-  }, 0);
+  const totalSales = todayOrders.reduce(
+    (sum, order) => sum + Number(order.totalAmount),
+    0
+  );
 
   const totalCost = todayOrders.reduce((sum, order) => {
     const items = order.orderItems ?? [];

@@ -17,3 +17,9 @@ export const registerUserAndStoreDto = z.object({
 });
 
 export type RegisterUserAndStoreDtoType = z.infer<typeof registerUserAndStoreDto>;
+
+export const checkEmailDto = registerUserAndStoreDto.pick({
+  email: true
+});
+
+export type CheckEmailDtoType = z.infer<typeof checkEmailDto>;
