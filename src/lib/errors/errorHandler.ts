@@ -1,56 +1,56 @@
-import { NextResponse } from 'next/server';
-import { ZodError } from 'zod';
+import { NextResponse } from "next/server";
+import { ZodError } from "zod";
 import {
   ForbiddenError,
   ResourceNotFound,
   UnauthorizedError,
   ValidationError,
-} from './customErrors';
-import { Prisma } from '@prisma/client';
+} from "./customErrors";
+import { Prisma } from "@prisma/client";
 
 export function handleError(error: unknown, message?: string) {
   //Zod validation error
   if (error instanceof ZodError) {
     return NextResponse.json(
-      { status: 'fail', message: error.issues },
+      { status: "fail", message: error.issues },
       { status: 400 }
     );
   }
   // Prisma known errors (e.g., unique constraint failed)
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    if (error.code === 'P2002') {
+    if (error.code === "P2002") {
       return NextResponse.json(
         {
-          status: 'fail',
+          status: "fail",
           message: `Ya existe un registro con ese valor en el campo: ${error.meta?.target}`,
         },
         { status: 409 }
       );
     }
 
-    if (error.code === 'P2003') {
+    if (error.code === "P2003") {
       return NextResponse.json(
         {
-          status: 'fail',
+          status: "fail",
           message:
-            'Violación de clave foránea. Verificá que el ID referenciado exista.',
+            "Violación de clave foránea. Verificá que el ID referenciado exista.",
         },
         { status: 400 }
       );
     }
-    if (error.code === 'P2034') {
+    if (error.code === "P2034") {
       return NextResponse.json(
         {
-          status: 'fail',
+          status: "fail",
           message:
-            'La transacción falló debido a un conflicto de escritura o un bloqueo.',
+            "La transacción falló debido a un conflicto de escritura o un bloqueo.",
         },
         { status: 400 }
       );
     }
     return NextResponse.json(
       {
-        status: 'fail',
+        status: "fail",
         message: `Error de base de datos: ${error.message}`,
       },
       { status: 400 }
@@ -60,7 +60,7 @@ export function handleError(error: unknown, message?: string) {
   // Prisma validation error (inputs inválidos en el modelo)
   if (error instanceof Prisma.PrismaClientValidationError) {
     return NextResponse.json(
-      { status: 'fail', message: 'Datos inválidos para la base de datos' },
+      { status: "fail", message: "Datos inválidos para la base de datos" },
       { status: 400 }
     );
   }
@@ -72,8 +72,8 @@ export function handleError(error: unknown, message?: string) {
   ) {
     return NextResponse.json(
       {
-        status: 'error',
-        message: 'Error crítico en el cliente de base de datos',
+        status: "error",
+        message: "Error crítico en el cliente de base de datos",
       },
       { status: 500 }
     );
@@ -82,21 +82,21 @@ export function handleError(error: unknown, message?: string) {
   //Autorización
   if (error instanceof UnauthorizedError) {
     return NextResponse.json(
-      { status: 'fail', message: error.message },
+      { status: "fail", message: error.message },
       { status: 401 }
     );
   }
   //Autenticación
   if (error instanceof ForbiddenError) {
     return NextResponse.json(
-      { status: 'fail', message: error.message },
+      { status: "fail", message: error.message },
       { status: 403 }
     );
   }
   //No encuentra recurso por id
   if (error instanceof ResourceNotFound) {
     return NextResponse.json(
-      { status: 'fail', message: error.message },
+      { status: "fail", message: error.message },
       { status: 404 }
     );
   }
@@ -104,17 +104,17 @@ export function handleError(error: unknown, message?: string) {
   //No encuentra recurso por id
   if (error instanceof ValidationError) {
     return NextResponse.json(
-      { status: 'fail', message: error.message },
+      { status: "fail", message: error.message },
       { status: 400 }
     );
   }
   //Otros errores
   if (error instanceof Error) {
     return NextResponse.json(
-      { status: 'fail', message: error.message },
+      { status: "fail", message: error.message },
       { status: 500 }
     );
   }
   //Respuesta por defecto
-  return NextResponse.json({ status: 'fail', message }, { status: 500 });
+  return NextResponse.json({ status: "fail", message }, { status: 500 });
 }
