@@ -33,9 +33,10 @@ export const getAllProducts = async (
     if (params) {
       const parsedParams = querySearchParamsValidator.safeParse(params);
 
-      if (parsedParams.data?.isActive) {
+      if (parsedParams.data?.isActive !== undefined ) {
         whereValues.is_active = parsedParams.data.isActive;
       }
+
       if (parsedParams.data?.page && parsedParams.data.limit) {
         const skip = (parsedParams.data?.page - 1) * parsedParams.data.limit;
         const [items, totalItems] = await Promise.all([
