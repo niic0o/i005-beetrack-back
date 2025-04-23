@@ -13,15 +13,6 @@ on:
 
 env:
   PROJECT_ID: "training-batch-05"
-  DATABASE_URL: "${{ secrets.DATABASE_URL }}"
-  DATABASE_URL_PRODUCTION: "${{ secrets.DATABASE_URL_PRODUCTION }}"
-  SECRET_KEY: "${{ secrets.SECRET_KEY }}"
-  CLOUDINARY_CLOUD_NAME: "${{ secrets.CLOUDINARY_CLOUD_NAME }}"
-  CLOUDINARY_API_KEY: "${{ secrets.CLOUDINARY_API_KEY }}"
-  CLOUDINARY_SECRET_KEY: "${{ secrets.CLOUDINARY_SECRET_KEY }}"
-  CRON_API_KEY: "${{ secrets.CRON_API_KEY }}"
-  TEST_USER_EMAI: "${{ secrets.TEST_USER_EMAIL }}"
-  TEST_USER_PASSWORD: "${{ secrets.TEST_USER_PASSWORD }}"
 
 jobs:
   build-and-push-image:
@@ -107,8 +98,8 @@ jobs:
             -e CLOUDINARY_SECRET_KEY='${{ secrets.CLOUDINARY_SECRET_KEY }}' \
             -e ORIGIN_URL='${{ secrets.ORIGIN_URL }}' \
             -e CRON_API_KEY='${{ secrets.CRON_API_KEY }}' \
-            -e TEST_USER_EMAIL="${{ secrets.TEST_USER_EMAIL }}"
-            -e TEST_USER_PASSWORD="${{ secrets.TEST_USER_PASSWORD }}"
+            -e TEST_USER_EMAIL="${{ secrets.TEST_USER_EMAIL }}" \
+            -e TEST_USER_PASSWORD="${{ secrets.TEST_USER_PASSWORD }}" \
             -e DEBUG=false \
             --name beetrack-back \
             --restart=unless-stopped \
