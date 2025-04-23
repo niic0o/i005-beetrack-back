@@ -132,7 +132,6 @@ export const createOrder = async (data: CreateOrderRequestDto) => {
     //devolver id, status, pdfPath, subtotal, total, fecha y método de pago
     return toCreateOrderResponseDto(createdOrder, data.paymentMethod || '');
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };
