@@ -18,6 +18,13 @@ export const createProductRequestDto = z.object({
       return val;
     }, z.boolean())
     .optional(),
+  is_active: z
+    .preprocess((val) => {
+      if (val === 'true') return true;
+      if (val === 'false') return false;
+      return val;
+    }, z.boolean())
+    .optional(),
   storeId: z.string().nonempty(),
   salesPrice: z.coerce.number().positive(),
   costPrice: z.coerce.number().positive(),
