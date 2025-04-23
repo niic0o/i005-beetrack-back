@@ -106,6 +106,9 @@ jobs:
             -e CLOUDINARY_API_KEY='${{ secrets.CLOUDINARY_API_KEY }}' \
             -e CLOUDINARY_SECRET_KEY='${{ secrets.CLOUDINARY_SECRET_KEY }}' \
             -e ORIGIN_URL='${{ secrets.ORIGIN_URL }}' \
+            -e CRON_API_KEY='${{ secrets.CRON_API_KEY }}' \
+            -e TEST_USER_EMAIL="${{ secrets.TEST_USER_EMAIL }}"
+            -e TEST_USER_PASSWORD="${{ secrets.TEST_USER_PASSWORD }}"
             -e DEBUG=false \
             --name beetrack-back \
             --restart=unless-stopped \
