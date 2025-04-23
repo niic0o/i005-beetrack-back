@@ -91,7 +91,7 @@ jobs:
         run: |
           docker run -d \
             -p 3000:3000 \
-            -e DATABASE_URL="${{ secrets.DATABASE_URL_PRODUCTION }}" \
+            -e DATABASE_URL_PRODUCTION="${{ secrets.DATABASE_URL_PRODUCTION }}" \
             -e SECRET_KEY='${{ secrets.SECRET_KEY }}' \
             -e CLOUDINARY_CLOUD_NAME='${{ secrets.CLOUDINARY_CLOUD_NAME }}' \
             -e CLOUDINARY_API_KEY='${{ secrets.CLOUDINARY_API_KEY }}' \
