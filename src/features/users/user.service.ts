@@ -173,7 +173,6 @@ export const updateUser = async (
   userData: Partial<UserSafeData>
 ) => {
   const parsedData = updateUserRequestDto.parse(userData);
-  console.log("Desde userService el store parseado: ", parsedData);
 
   const updatedUser = await prisma.user.update({
     where: {

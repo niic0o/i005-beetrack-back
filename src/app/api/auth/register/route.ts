@@ -11,7 +11,6 @@ export async function POST(req: Request) {
 
     // Lógica principal: crear usuario + tienda + userStore
     const createdUser = await registerUserAndStore(body);
-    console.log("createdUser", createdUser);
     
     if (!createdUser) {
       throw new Error('Error al crear el usuario o la tienda');

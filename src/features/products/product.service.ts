@@ -32,12 +32,11 @@ export const getAllProducts = async (
     let whereValues: Record<string, string | boolean> = { storeId };
     if (params) {
       const parsedParams = querySearchParamsValidator.safeParse(params);
-      console.log(parsedParams)
-      console.log(whereValues)
+
       if (parsedParams.data?.isActive !== undefined ) {
         whereValues.is_active = parsedParams.data.isActive;
       }
-      console.log(whereValues)
+
       if (parsedParams.data?.page && parsedParams.data.limit) {
         const skip = (parsedParams.data?.page - 1) * parsedParams.data.limit;
         const [items, totalItems] = await Promise.all([
