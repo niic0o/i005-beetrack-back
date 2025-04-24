@@ -6,42 +6,25 @@
   Si es valido continua con el acceso, si no responde con un error 401 Unauthorized
 
 */
+// middleware/auth.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
-// export const config = {
-//   // Ejecuta el middleware para todos menos:
-//   matcher: ['/((?!api/auth/login|_next/static|_next/image|favicon.ico).*)'],
-// };
-
-const secret_key = new TextEncoder().encode(process.env.SECRET_KEY);
+const secretKey = new TextEncoder().encode(process.env.SECRET_KEY);
 
 export async function authMiddleware(request: NextRequest) {
-  const jwt = request.cookies.get('token')?.value;
-
-  if (!jwt) {
-    // Cuando tengamos front esto redirige a la página del login:
-    // return NextResponse.redirect(new URL("/auth/login", request.url));
-    return NextResponse.json(
-      { message: 'No ha iniciado sesión' },
-      { status: 401 }
-    );
+  const token = request.cookies.get('token')?.value;
+  if (!token) {
+    return NextResponse.json({ message: 'No ha iniciado sesión' }, { status: 401 });
   }
 
   try {
-    const { payload } = await jwtVerify(jwt, secret_key);
-    // Podrías tipar `payload` si querés más seguridad
-  } catch (err: unknown) {
-    const errorMessage =
-      err instanceof Error ? err.message : 'Error desconocido';
-
-    console.error('Error al verificar el token:', errorMessage);
-
-    return NextResponse.json(
-      { message: 'Token inválido o expirado' },
-      { status: 401 }
-    );
+    await jwtVerify(token, secretKey);
+  } catch (err) {
+    console.error('Token inválido:', err);
+    return NextResponse.json({ message: 'Token inválido o expirado' }, { status: 401 });
   }
-  return null;
+
+  return null; // sigue al handler
 }
