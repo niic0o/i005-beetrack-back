@@ -27,9 +27,14 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build Docker Image
-        run: |
-          docker build -t beetrack-back-prod .
+      - name: Build Docker image (Render-style)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false  # No se sube a ningún registry
+          build-args: |
+            ORIGIN_URL=${{ secrets.ORIGIN_URL }}
       
       - name: Login to Render
         run: |
