@@ -3,7 +3,6 @@
 Beetrack es una solución SaaS pensada para comercios pequeños que buscan una plataforma simple pero poderosa para **gestionar ventas, productos e inventario** desde cualquier lugar.
 
 ---
-
 ## 🚀 Funcionalidades Principales
 
 - Registro y autenticación de usuarios
@@ -16,21 +15,21 @@ Beetrack es una solución SaaS pensada para comercios pequeños que buscan una p
 
 ---
 
-## 🧑‍💻 Tecnologías Usadas
+## 🧑‍💻 Principales Tecnologías Usadas
 
-| Parte         | Tecnología                   |
-|--------------|------------------------------|
-| Frontend     | React, Next.js, Tailwind CSS |
-| Backend      | Node.js, Next.js         |
-| Base de Datos| MongoDB + Prisma             |
-| Deploy Front | Vercel                       |
-| Deploy Back  | Render                       |
-| Seguridad    | JWT, Bcrypt, Middlewares     |
-| Otros        | Git, GitHub, Postman         |
+| Feat         | Tecnología                          |
+|--------------|--------------------------------------|
+| Frontend     | React, chakra-ui, Vite, Tailwind CSS |
+| Backend      | Node.js, Next.js,                    |
+| Base de Datos| PostgreSQL + Prisma                  |
+| Deploy Front | Vercel                               |
+| Deploy Back  | Render, GCP                          |
+| Seguridad    | JWT, Bcrypt, Middlewares             |
+| Otros        | Cloudinary, zod, pdfkit, eslint      |
 
 ---
 
-## 👨‍👩‍👧‍👦 Equipo
+## 👨‍👩‍👧‍👦 Equipo | Contactos
 
 ### Backend
 - Nico [Apellido]
@@ -56,6 +55,45 @@ Beetrack es una solución SaaS pensada para comercios pequeños que buscan una p
 
 ---
 
+## Para probar localmente
+
+### - Paso 1 | Clonar el repositorio BACKEND:
+
+```bash
+git clone https://github.com/niic0o/i005-beetrack-back.git
+```
+### - Paso 2 | Instalar las dependencias:
+```bash
+npm install
+```
+```bash
+npx prisma generate
+```
+### - Paso 3 | Crear un archivo .env en la raiz del proyecto con las variables del .env.example. o solicitarlas
+
+### - Paso 4 | Correr el proyecto en modo de desarrollo:
+```bash
+npm run dev
+```
+### La API estará corriendo en http://localhost:3000
+
+### - Paso 6 | Clonar el repositorio FRONTEND:
+
+```bash
+git clone https://github.com/niic0o/i005-beetrack-front.git
+```
+### - Paso 7 | Instalar las dependencias:
+```bash
+npm install
+```
+### - Paso 8 | Copiar la url donde se levante (paso 10) y modificar ORIGIN_URL del .env del frontend
+
+### - Paso 9 | Correr el proyecto en modo de desarrollo:
+```bash
+npm run dev
+```
+### La API estará corriendo en http://localhost:5473
+---
 ## Resumen de la 📄 Licencia
 
 | Característica                    | Estado                                         |
