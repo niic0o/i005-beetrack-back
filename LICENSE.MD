@@ -79,6 +79,7 @@ Este proyecto incluye contribuciones específicas en áreas clave:
 - **Calidad y aseguramiento (QA):** documentación de pruebas, matrices de regresión, informes de bugs, validaciones funcionales y propuestas de mejora.
 - **Product Manager (PM):** Documentos de organización y gestión del proyecto.
 Estos materiales son considerados parte del software **Beetrack** y están sujetos a la misma protección que el resto del código fuente.
+- **DevOps:** Despliegue de la base de datos y backend temporal en Google Cloud Platform 
 
 **No está permitido** copiar, distribuir, reutilizar, modificar ni presentar como propio ninguno de estos recursos sin autorización expresa **y por escrito** de sus autores respectivos.
 
@@ -87,6 +88,7 @@ Estos materiales son considerados parte del software **Beetrack** y están sujet
 - **UX/UI:** Esteban Segui, Maryallyn Jimenez, Sergio Fabian Rodriguez Rivero
 - **QA:** Mariana Ludueña, Lucas Echeveste Villavicencio, Hugo Andrés Aminey, 
 - **PM:** Tomas Gustavo Ortiz
+- **DevOps:** Adrián Ramos
 ---
 
 ## Contacto
