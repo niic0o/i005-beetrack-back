@@ -1,7 +1,7 @@
 # Beetrack – SALES & INVENTORY MANAGER
 
 Beetrack es una solución SaaS pensada para comercios pequeños que buscan una plataforma simple pero poderosa para
-**gestionar ventas, empleados, cargar productos y contralar inventario visualizando datos estadísticos** desde cualquier lugar.
+**gestionar ventas, empleados, cargar productos y contratar inventario visualizando datos estadísticos** desde cualquier lugar.
 
 ---
 
@@ -18,7 +18,7 @@ Beetrack es una solución SaaS pensada para comercios pequeños que buscan una p
 
 ---
 
-## 🧑‍💻 Principales Tecnologías Usadas
+## 🛠️ Principales Tecnologías Usadas
 
 | Feat          | Tecnología                           |
 | ------------- | ------------------------------------ |
@@ -32,14 +32,16 @@ Beetrack es una solución SaaS pensada para comercios pequeños que buscan una p
 
 ---
 
-## 👨‍👩‍👧‍👦 Equipo | Contactos
+## 👨‍💻👩‍💻 Equipo | Contactos
 
 ### Backend Developers
 
 - **Nicolás Ariel Sena**:
   [![LinkedIn](https://img.shields.io/badge/LinkedIn-Nicolas_Sena-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/nicosena10/)
   [![GitHub](https://img.shields.io/badge/GitHub-Nicolas_Sena-black?style=for-the-badge&logo=github)](https://github.com/niic0o/)
-- **Paulina Carolina Serrano:**
+
+- **Paula Carolina Serrano:**
+
   [![LinkedIn](https://img.shields.io/badge/LinkedIn-Carolina_Serrano-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/paula-carolina-serrano/)
   [![GitHub](https://img.shields.io/badge/GitHub-Carolina_Serrano-black?style=for-the-badge&logo=github)](https://github.com/CaroSerrano)
 

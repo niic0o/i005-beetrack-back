@@ -7,7 +7,7 @@
 
 ## Autores
 
-- **Backend Developers:** Nicolás Ariel Sena & Paula Carolina Serrano.
+- **Backend Developers:** Nicolás Ariel Sena y Paula Carolina Serrano.
 - **Frontend Developers:** Javier Hidalgo, Jonathan Muñoz, Jason Olivierre y German Dosaula Ces.
 
 ---
@@ -87,7 +87,11 @@ Estos materiales son considerados parte del software **Beetrack** y están sujet
 
 - **UX/UI:** Esteban Segui, Maryallyn Jimenez, Sergio Fabian Rodriguez Rivero
 - **QA:** Mariana Ludueña, Lucas Echeveste Villavicencio, Hugo Andrés Aminey, 
+<<<<<<< HEAD
 - **PM:** Tomas Gustavo Ortiz
+=======
+- **PM:** Tomás Gustavo Ortiz
+>>>>>>> dev-nico
 - **DevOps:** Adrián Ramos
 ---
 
