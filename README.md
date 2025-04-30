@@ -36,12 +36,11 @@ Beetrack es una solución SaaS pensada para comercios pequeños que buscan una p
 
 ### Backend Developers
 
-- **Nicolás Ariel Sena**:
+- **Nicolás Ariel Sena:**
   [![LinkedIn](https://img.shields.io/badge/LinkedIn-Nicolas_Sena-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/nicosena10/)
   [![GitHub](https://img.shields.io/badge/GitHub-Nicolas_Sena-black?style=for-the-badge&logo=github)](https://github.com/niic0o/)
 
 - **Paula Carolina Serrano:**
-
   [![LinkedIn](https://img.shields.io/badge/LinkedIn-Carolina_Serrano-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/paula-carolina-serrano/)
   [![GitHub](https://img.shields.io/badge/GitHub-Carolina_Serrano-black?style=for-the-badge&logo=github)](https://github.com/CaroSerrano)
 
