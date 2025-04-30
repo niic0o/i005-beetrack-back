@@ -56,11 +56,17 @@ Beetrack es una solución SaaS pensada para comercios pequeños que buscan una p
 
 ---
 
-## 📄 Licencia
+## Resumen de la 📄 Licencia
 
-Este proyecto se encuentra protegido por una licencia personalizada.  
-**✔ Se permite su uso educativo y personal**.  
-**❌ Se prohíbe su uso con fines comerciales o para ofrecer servicios a terceros.**
+| Característica                    | Estado                                         |
+|-----------------------------------|------------------------------------------------|
+| ¿Uso comercial permitido?         | ❌ No                                          |
+| ¿Uso educativo gratuito permitido?| ✅ Sí                                          |
+| ¿Se puede modificar el código?    | ✅ Sí (sin uso comercial)                      |
+| ¿Copyleft?                        | ⚠️ Parcial                                     |
+| ¿Distribución permitida?          | ✅ Solo con atribución y sin fines comerciales |
+| ¿Fork permitido?                  | ✅ Sí, bajo condiciones de la licencia         |
+
 
 Leé los detalles completos en [`LICENSE.md`](./LICENSE.md)
 
