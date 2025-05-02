@@ -46,12 +46,7 @@ export default function generatePdf(
   discount: number,
   total: number
 ) {
-  const fontPath = path.join(
-    process.cwd(),
-    'public',
-    'fonts',
-    'Montserrat-Regular.ttf'
-  );
+  const fontPath = path.join(process.cwd(), 'src', 'assets', 'fonts', 'Montserrat-Regular.ttf');
 
   const doc = new PDFDocument({ margin: 50, font: fontPath });
 

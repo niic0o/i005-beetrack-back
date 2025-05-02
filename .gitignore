@@ -15,6 +15,7 @@
 
 # production
 /build
+/.github/workflows/_old_backend.yaml
 
 # misc
 .DS_Store
