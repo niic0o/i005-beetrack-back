@@ -18,6 +18,7 @@ import {
   startOfLocalDay,
   endOfLocalDay,
 } from "./utils/date";
+import { ValidationError } from "@/lib/errors/customErrors";
 
 export const getDashboardData = async ({
   storeId,
@@ -28,7 +29,7 @@ export const getDashboardData = async ({
 }: DashboardParams): Promise<DashboardData> => {
   switch (view) {
     case "daily":
-      if (!date) throw new Error("Se requiere 'date' para la vista diaria");
+      if (!date) throw new ValidationError("Se requiere 'date' para la vista diaria");
 
       const dailyReport = await prisma.dailyReport.findFirst({
         where: {
@@ -44,7 +45,7 @@ export const getDashboardData = async ({
 
     case "range":
       if (!fromDate || !toDate)
-        throw new Error(
+        throw new ValidationError(
           "Se requieren 'fromDate' y 'toDate' para vista de rango"
         );
 
@@ -71,7 +72,7 @@ export const getDashboardData = async ({
       }
 
       if (!fromDate || !toDate)
-        throw new Error(
+        throw new ValidationError(
           "Se requiere 'date' o 'fromDate' y 'toDate' para vista de top productos"
         );
 
@@ -236,6 +237,6 @@ export const getDashboardData = async ({
       */
 
     default:
-      throw new Error("Vista inválida");
+      throw new ValidationError("Vista inválida");
   }
 };

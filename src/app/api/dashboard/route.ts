@@ -15,6 +15,7 @@ import { getDashboardData } from "@/features/dashboard/dashboard.service";
 import { dashboardQuerySchema } from "./dto";
 import { parseLocalDate } from "@/features/dashboard/utils/date";
 import { getUserFromToken } from "@/lib/getUserFromToken";
+import { handleError } from "@/lib/errors/errorHandler";
 
 /**
   Funcion que permite obtener reportes estadísticos del comercio
@@ -51,7 +52,7 @@ export async function GET(req: Request) {
     return NextResponse.json(result);
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: "Error al obtener dashboard" }, { status: 500 });
+    return handleError(error);
   }
 }
 
