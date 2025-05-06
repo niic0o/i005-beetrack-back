@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 import { getUserProfile } from "@/features/users/user.service";
+import { handleError } from "@/lib/errors/errorHandler";
 
 const secret_key = new TextEncoder().encode(process.env.SECRET_KEY);
 
@@ -31,6 +32,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(profile);
   } catch (error) {
     console.error("Error al obtener perfil:", error);
-    return NextResponse.json({ message: "Token inválido o expirado" }, { status: 401 });
+    return handleError(error);
   }
 }
