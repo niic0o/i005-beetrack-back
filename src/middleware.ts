@@ -25,6 +25,7 @@ export async function middleware(req: NextRequest) {
     '/api/auth/register/check-email',
     '/api/health',
     '/api/report',
+    '/api/docs',
   ];
   if (!excluded.includes(req.nextUrl.pathname)) {
     // ¡await aquí!

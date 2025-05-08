@@ -1,8 +1,15 @@
 import { prisma } from '@/lib/prisma';
 import { Prisma, PaymentMethod, OrderStatus } from '@prisma/client';
-import { faker } from '@faker-js/faker';
+import { Faker, es, en } from '@faker-js/faker';
 import { setProductStatus } from '@/features/products/utils';
 import { createHash } from '@/features/users/utils';
+import { getImgUnsplash, downloadImage } from '@/lib/imgUnsplash';
+import testProduts from './testProducts.json';
+import { uploadFileForSeeding } from '@/lib/cloudinary';
+import { removeFile } from '@/features/products/utils';
+import { resolve } from 'path';
+
+const faker = new Faker({ locale: [es, en] }); //busca resultados en español, si no encuentra, busca en inglés
 
 async function main() {
   // Crear Payments
@@ -17,7 +24,9 @@ async function main() {
     Array.from({ length: 10 }).map(() =>
       prisma.discount.create({
         data: {
-          rate: new Prisma.Decimal(faker.number.float({ min: 5, max: 30 })),
+          rate: new Prisma.Decimal(
+            faker.number.float({ min: 5, max: 30, fractionDigits: 0 })
+          ),
         },
       })
     )
@@ -51,7 +60,7 @@ async function main() {
     )
   );
 
-  //Crear el usuario para testear 
+  //Crear el usuario para testear
   const password = process.env.TEST_USER_PASSWORD!;
   const email = process.env.TEST_USER_EMAIL!;
 
@@ -91,10 +100,55 @@ async function main() {
     })
   );
 
+  //Crear productos con imágenes para la tienda del user test
+  const unsplash = process.env.UNSPLASH_API_KEY || '';
+  const testProducts = await Promise.all(
+    testProduts.map(async (p) => {
+      const img = await getImgUnsplash(unsplash, p.name_en);
+      let cloudinaryImgPath: string = '';
+      let cloudinaryId: string = '';
+
+      const filePath = await downloadImage(img, p.barcode);
+      const absolutePath = resolve(filePath!);
+
+      if (filePath) {
+        const cloudinaryResult = await uploadFileForSeeding(
+          absolutePath,
+          'products_test'
+        );
+        cloudinaryImgPath = cloudinaryResult.secure_url;
+        cloudinaryId = cloudinaryResult.public_id;
+        removeFile(filePath);
+      }
+      const stock = p.stock;
+      const stock_min = p.stock_min;
+      const stock_optimus = p.stock_optimum;
+      const status = setProductStatus(stock, stock_min, stock_optimus);
+      return prisma.product.create({
+        data: {
+          name: p.name,
+          barcode: p.barcode,
+          salesPrice: p.salesPrice,
+          costPrice: p.costPrice,
+          description: p.description,
+          imagePath: cloudinaryImgPath,
+          cloudinary_id: cloudinaryId,
+          stock,
+          stock_min,
+          stock_optimus,
+          storeId: storeTest.id,
+          status,
+        },
+      });
+    })
+  );
+
   // Crear Products
   const products = await Promise.all(
     Array.from({ length: 100 }).map(() => {
-      const store = faker.helpers.arrayElement(stores);
+      const store = faker.helpers.arrayElement(
+        stores.filter((s) => s.id !== storeTest.id)
+      );
       const stock = faker.number.int({ min: 1, max: 200 });
       const stock_min = 10;
       const stock_optimus = 50;
@@ -103,16 +157,16 @@ async function main() {
       return prisma.product.create({
         data: {
           barcode: faker.string.numeric(13),
-          name: faker.commerce.productName(),
+          name: faker.food.ingredient(),
           description: faker.commerce.productDescription(),
           stock,
           stock_min,
           stock_optimus,
           costPrice: new Prisma.Decimal(
-            faker.commerce.price({ min: 10, max: 20000 })
+            faker.commerce.price({ min: 10, max: 10000 })
           ),
           salesPrice: new Prisma.Decimal(
-            faker.commerce.price({ min: 50, max: 40000 })
+            faker.commerce.price({ min: 50, max: 15000 })
           ),
           storeId: store.id,
           status,
@@ -122,44 +176,43 @@ async function main() {
     })
   );
 
-  // Seed Orders y OrderLines
+  const totalProducts = products.concat(testProducts);
+
+  // Crear Orders y OrderLines solo para la tienda del admin
   const orders = await Promise.all(
     Array.from({ length: 50 }).map(async () => {
-      const store = faker.helpers.arrayElement(stores);
-      const discount = faker.helpers.maybe(() =>
-        faker.helpers.arrayElement(discounts)
-      );
-      const payment = faker.helpers.maybe(() =>
-        faker.helpers.arrayElement(payments)
-      );
+      // const store = faker.helpers.arrayElement(totalStores);
+      const discount = faker.helpers.arrayElement(discounts);
+      const payment = faker.helpers.arrayElement(payments);
 
       const order = await prisma.order.create({
         data: {
-          storeId: store.id,
-          discountID: discount?.id,
-          paymentId: payment?.id,
+          storeId: storeTest.id,
+          discountID: discount.id,
+          paymentId: payment.id,
           subTotalAmount: new Prisma.Decimal(0),
           totalAmount: new Prisma.Decimal(0),
           status: OrderStatus.PAID,
+          createdAt: faker.date.between({from: '2024-01-01', to: new Date()})
         },
       });
 
-      const usedProductIds = new Set<string>();
+      //Se verifica que no haya 2 duplas storeId-barcode iguales
+      const usedProductBarcodes = new Set<string>();
       const numLines = faker.number.int({ min: 1, max: 5 });
       let subTotal = new Prisma.Decimal(0);
-      let orderItems = []; //era para usar en la generación de PDFs pero lo descarté
       for (let i = 0; i < numLines; i++) {
         let product: (typeof products)[number];
         let attempts = 0;
 
         do {
-          product = faker.helpers.arrayElement(products);
+          product = faker.helpers.arrayElement(totalProducts);
           attempts++;
-        } while (usedProductIds.has(product.id) && attempts < 10);
+        } while (usedProductBarcodes.has(product.barcode) && attempts < 10);
 
-        if (usedProductIds.has(product.id)) break;
+        if (usedProductBarcodes.has(product.barcode)) break;
+        usedProductBarcodes.add(product.barcode);
 
-        usedProductIds.add(product.id);
         const quantity = faker.number.int({ min: 1, max: 10 });
         const lineTotal = product.salesPrice.mul(quantity).toDecimalPlaces(2);
         subTotal = subTotal.add(lineTotal);
@@ -171,12 +224,6 @@ async function main() {
             quantity,
             totalSalesPrice: lineTotal,
           },
-        });
-        orderItems.push({
-          productId: product.id,
-          name: product.name,
-          quantity,
-          salesPrice: Number(product.salesPrice),
         });
       }
       let totalAmount: Prisma.Decimal;

@@ -147,9 +147,10 @@ export const getOrders = async (
       limit = parsedParams.data.limit;
     }
   }
-  
+
   const orders = await prisma.order.findMany({
     where: { storeId },
+    orderBy: { createdAt: 'desc' },
     select: {
       id: true,
       status: true,

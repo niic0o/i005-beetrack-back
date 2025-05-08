@@ -19,6 +19,18 @@ export async function uploadFile(filePath: string, folder: string, format:string
   });
 }
 
+export async function uploadFileForSeeding(filePath: string, folder: string) {
+  return await cloudinary.uploader.upload(filePath, {
+    folder: `beetrack/${folder}`,
+    use_filename: true,
+    resource_type: 'auto',
+    width: 600,
+    height: 600,
+    crop: 'fill',
+    quality: 'auto',
+  });
+}
+
 export async function deleteFile(cloudinary_id: string) {
   return await cloudinary.uploader.destroy(cloudinary_id);
 }
