@@ -24,13 +24,12 @@ export async function PATCH(req: NextRequest) {
     if (!user) {
       throw new ResourceNotFound('Usuario no encontrado');
     }
-    const formData = await req.formData();
-    const file = formData.get('file');
-
     const profile = await getUserProfile(user.userId, user.storeId);
     if (!profile || !profile.store) {
       throw new ResourceNotFound('Usuario no encontrado');
     }
+    const formData = await req.formData();
+    const file = formData.get('file');
     if (file) {
       if (!isValidFile(file)) {
         throw new ValidationError('Archivo no válido');
