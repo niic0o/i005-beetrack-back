@@ -7,6 +7,8 @@ export interface UserSafeData {
   birthdate: Date;
   email: string;
   status: $Enums.Status;
+  avatar: string | null;
+  cloudinary_id: string | null;
   createdAt: Date;
   updatedAt: Date;
 }

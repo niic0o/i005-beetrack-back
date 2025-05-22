@@ -6,6 +6,10 @@ export const updateUserRequestDto = registerUserAndStoreDto
     name: true,
     last_name: true,
     email: true,
+  })
+  .extend({
+    avatar: z.string().max(250),
+    cloudinary_id: z.string().max(250),
   })  
   .partial();
 

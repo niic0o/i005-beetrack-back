@@ -72,8 +72,19 @@ export const userContract = c.router({
         message: z.string().openapi({ example: 'Some internal server error' }),
       }),
     },
-    contentType: 'application/json',
-    body: updateUserRequestDto,
+    contentType: 'multipart/form-data',
+    body: updateUserRequestDto
+      .omit({
+        cloudinary_id: true,
+        avatar: true,
+      })
+      .extend({
+        file: z.any().openapi({
+          type: 'string',
+          format: 'binary',
+          example: 'avatar.png',
+        }),
+      }),
     summary: 'Update user data',
     metadata: { requiresAuth: true },
   },

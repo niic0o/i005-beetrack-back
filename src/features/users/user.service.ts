@@ -5,6 +5,7 @@ import { ValidationError, ForbiddenError } from "@/lib/errors/customErrors";
 import { Store } from "@prisma/client"; //para tipar un tipo de dato usando el modelo de la bdd
 import { updateUserRequestDto } from "./DTOs/updateUserRequestDto";
 import { updateStoreRequestDto } from "./DTOs/updateStoreRequestDto";
+import { formDataToObject } from "../../lib/formDataToObject";
 
 // checkear email antes de seguir el proceso de registro
 export async function checkEmailExists(email: string) {
@@ -125,6 +126,8 @@ export const getUserProfile = async (
       email: true,
       birthdate: true,
       status: true,
+      avatar: true,
+      cloudinary_id: true,
       createdAt: true,
       updatedAt: true,
       userStores: {
@@ -160,6 +163,8 @@ export const getUserProfile = async (
     email: profile.email,
     birthdate: profile.birthdate,
     status: profile.status,
+    avatar: profile.avatar,
+    cloudinary_id: profile.cloudinary_id,
     createdAt: profile.createdAt,
     updatedAt: profile.updatedAt,
     store: selectedStore, // puede ser null si no hay coincidencia
@@ -170,9 +175,10 @@ export const getUserProfile = async (
 
 export const updateUser = async (
   user: UserSafeData,
-  userData: Partial<UserSafeData>
+  userData: FormData
 ) => {
-  const parsedData = updateUserRequestDto.parse(userData);
+  const objData = formDataToObject(userData);
+  const parsedData = updateUserRequestDto.parse(objData);
 
   const updatedUser = await prisma.user.update({
     where: {

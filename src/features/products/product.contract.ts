@@ -28,12 +28,20 @@ export const productContract = c.router({
       }),
     },
     contentType: 'multipart/form-data',
-    body: createProductRequestDto.omit({
-      cloudinary_id: true,
-      imagePath: true,
-      status: true,
-      storeId: true,
-    }),
+    body: createProductRequestDto
+      .omit({
+        cloudinary_id: true,
+        imagePath: true,
+        status: true,
+        storeId: true,
+      })
+      .extend({
+        file: z.any().openapi({
+          type: 'string',
+          format: 'binary',
+          example: 'example.png',
+        }),
+      }),
     summary: 'Create a product',
     metadata: { requiresAuth: true },
   },
@@ -95,12 +103,20 @@ export const productContract = c.router({
         message: z.string().openapi({ example: 'Some validation error' }),
       }),
     },
-    body: updateProductRequestDto.omit({
-      cloudinary_id: true,
-      imagePath: true,
-      status: true,
-      storeId: true,
-    }),
+    body: updateProductRequestDto
+      .omit({
+        cloudinary_id: true,
+        imagePath: true,
+        status: true,
+        storeId: true,
+      })
+      .extend({
+        file: z.any().openapi({
+          type: 'string',
+          format: 'binary',
+          example: 'example.png',
+        }),
+      }),
     summary: 'Update a product',
     metadata: { requiresAuth: true },
   },

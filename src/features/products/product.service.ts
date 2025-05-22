@@ -2,7 +2,7 @@ import { createProductRequestDto } from './DTOs/createProductRequestDto';
 import { updateProductRequestDto } from './DTOs/updateProductRequestDto';
 import { prisma } from '@/lib/prisma';
 import { Product } from '@prisma/client';
-import { formDataToObject } from './Mappers/formDataToObject';
+import { formDataToObject } from '../../lib/formDataToObject';
 import { setProductStatus } from './utils';
 import { querySearchParamsValidator } from './DTOs/querySearchParamsValidator';
 import { PaginationResult } from './types';
