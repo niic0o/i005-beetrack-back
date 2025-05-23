@@ -29,7 +29,7 @@ export async function PATCH(req: NextRequest) {
       throw new ResourceNotFound('Usuario no encontrado');
     }
     const formData = await req.formData();
-    const file = formData.get('file');
+    const file = formData.get('avatar');
     if (file) {
       if (!isValidFile(file)) {
         throw new ValidationError('Archivo no válido');
@@ -44,8 +44,7 @@ export async function PATCH(req: NextRequest) {
       }
       removeFile(filePath);
 
-      formData.delete('file');
-      formData.append('avatar', cloudinaryResult.secure_url);
+      formData.set('avatar', cloudinaryResult.secure_url);
       formData.append('cloudinary_id', cloudinaryResult.public_id);
     }
 

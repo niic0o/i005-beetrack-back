@@ -79,7 +79,7 @@ export const userContract = c.router({
         avatar: true,
       })
       .extend({
-        file: z.any().openapi({
+        avatar: z.any().openapi({
           type: 'string',
           format: 'binary',
           example: 'avatar.png',
